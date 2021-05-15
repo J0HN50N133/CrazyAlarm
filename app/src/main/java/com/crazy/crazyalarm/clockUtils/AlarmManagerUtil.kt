@@ -10,10 +10,12 @@ import java.util.*
 object AlarmManagerUtil {
     const val ALARM_ACTION = "com.crazy.crazyalarm.clock"
     // To put and get parameter more easily
-    const val INTERVALLMILLIS: String = "intervalMillis"
-    const val MSG: String = "msg"
-    const val NOTICEFLAG: String = "soundOrVibrator"
-    const val ID: String = "id"
+    const val INTERVALLMILLIS = "intervalMillis"
+    const val MSG = "msg"
+    const val NOTICEFLAG = "soundOrVibrator"
+    const val ID = "id"
+    const val MODE = "mode"
+
     const val DayInMillis: Long = 86400000L
     const val WeekInMillis: Long= 604800000L
 
@@ -41,28 +43,49 @@ object AlarmManagerUtil {
     object OnlySound : NoticeFlag()
     object OnlyVibrator : NoticeFlag()
     object BothSoundAndVibrator : NoticeFlag()
+    sealed class Mode:Serializable
+    class Norm : Mode() {
+
+    }
+    class Math : Mode() {
+
+    }
+    class Memo : Mode() {
+
+    }
+    class Draw : Mode() {
+
+    }
+    class Scan : Mode() {
+
+    }
+
     /**
-     * @param flag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复
+     * @param cycleFlag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复
      * @param hour 时
      * @param minute 分
-     * @param
+     * @param prompt 提示信息
+     * @param id 闹钟id
+     * @param noticeFlag 震动还是声音
+     * @param week week=0表示一次性闹钟，非0的情况下是几就表示以一周为周期重复响铃
      */
     fun setAlarm(
         context: Context,
         hour: Int,
         minute: Int,
-        flag: CycleFlag,
+        cycleFlag: CycleFlag,
         prompt: String,
         id: Int,
         noticeFlag: NoticeFlag,
-        week: Int
+        week: Int,
+        mode: Mode
     ) {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val calendar:Calendar  = Calendar.getInstance()
         var intervalMillis: Long = 0
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH), hour, minute, 10)
-        intervalMillis =  when(flag) {
+        intervalMillis =  when(cycleFlag) {
             is Once-> 0
             is Daily-> DayInMillis
             is Weekly-> WeekInMillis
@@ -72,6 +95,7 @@ object AlarmManagerUtil {
         intent.putExtra(MSG, prompt)
         intent.putExtra(ID, id)
         intent.putExtra(NOTICEFLAG, noticeFlag)
+        intent.putExtra(MODE, mode)
         val sender = PendingIntent.getBroadcast(context, id,
             intent, PendingIntent.FLAG_CANCEL_CURRENT)
         am.setWindow(

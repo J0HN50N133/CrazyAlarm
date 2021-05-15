@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
-import com.crazy.crazyalarm.databinding.ActivityClockAlarmBinding
 import com.crazy.crazyalarm.databinding.DialogSimpleBinding
-import java.security.Key
 
 class SimpleDialog(context: Context) : Dialog(context){
     companion object{

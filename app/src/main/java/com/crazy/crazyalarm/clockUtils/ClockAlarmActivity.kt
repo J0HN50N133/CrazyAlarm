@@ -25,8 +25,9 @@ class ClockAlarmActivity: Activity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClockAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val msg = intent.getStringExtra(AlarmManagerUtil.MSG)
+        val msg = intent.getStringExtra(AlarmManagerUtil.MSG) as String
         val noticeFlag = intent.getSerializableExtra(AlarmManagerUtil.NOTICEFLAG) as AlarmManagerUtil.NoticeFlag
+        showDialogInBroadcastReceiver(msg, noticeFlag)
     }
 
     private fun showDialogInBroadcastReceiver(msg: String, noticeFlag: NoticeFlag) {
