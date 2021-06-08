@@ -115,7 +115,7 @@ object AlarmManagerUtil {
             val c = Calendar.getInstance()
             var week: Int = c.get(Calendar.DAY_OF_WEEK)
             week = when(week){
-                1->7
+
                 2->1
                 3->2
                 4->3
