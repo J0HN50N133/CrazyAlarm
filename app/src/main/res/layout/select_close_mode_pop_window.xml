@@ -14,49 +14,56 @@
         android:orientation="vertical"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
-        <TextView style="@style/horizontal_line_style" />
 
         <TextView
-            android:id="@+id/tv_drugway_1"
+            android:id="@+id/tv_norm_mode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:drawableRight="@null"
-            android:gravity="center"
-            android:text="震动"
-            android:textColor="#333333"
-            android:textSize="20sp" />
+            android:text="普通模式"
+            android:textColor="@color/black_33"
+            android:textSize="20sp"/>
 
-        <TextView style="@style/horizontal_line_style" />
+        <TextView style="@style/horizontal_line_style"/>
 
         <TextView
-            android:id="@+id/tv_drugway_2"
+            android:id="@+id/tv_math_mode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:drawableRight="@null"
-            android:gravity="center"
-            android:text="响铃"
-            android:textColor="#333333"
-            android:textSize="20sp" />
-        <TextView style="@style/horizontal_line_style" />
+            android:text="数学模式"
+            android:textColor="@color/black_33"
+            android:textSize="20sp"/>
+
+        <TextView style="@style/horizontal_line_style"/>
 
         <TextView
-            android:id="@+id/tv_drugway_3"
+            android:id="@+id/tv_scan_mode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:drawableRight="@null"
-            android:gravity="center"
-            android:text="响铃并震动"
-            android:textColor="#333333"
-            android:textSize="20sp" />
+            android:text="扫描模式"
+            android:textColor="@color/black_33"
+            android:textSize="20sp"/>
+
+        <TextView style="@style/horizontal_line_style"/>
+
         <TextView
-            style="@style/horizontal_line_style"
-            android:layout_marginBottom="20dp" />
+            android:id="@+id/tv_jigsaw_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:drawableRight="@null"
+            android:text="拼图模式"
+            android:textColor="@color/black_33"
+            android:textSize="20sp"/>
     </LinearLayout>
 
 </RelativeLayout>

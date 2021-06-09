@@ -10,19 +10,19 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import com.crazy.crazyalarm.R
 import com.crazy.crazyalarm.databinding.SelectCyclePopWindowBinding
+import org.w3c.dom.Text
 
 @Suppress("DEPRECATION")
 class SelectCycleFlagPopup : View.OnClickListener {
     private var binding :SelectCyclePopWindowBinding
-    lateinit var mPopupWindow :PopupWindow
-    var selectCyclePopupOnClickListener :SelectCyclePopupOnClickListener? = null
+    private lateinit var mPopupWindow :PopupWindow
     private var mContext: Context
+    var selectCyclePopupOnClickListener :SelectCyclePopupOnClickListener? = null
 
     constructor(context: Context){
         mContext = context
         binding = SelectCyclePopWindowBinding.bind(
-            LayoutInflater.from(mContext)
-                          .inflate(R.layout.select_cycle_pop_window, null))
+            LayoutInflater.from(mContext).inflate(R.layout.select_cycle_pop_window, null))
         mPopupWindow = PopupWindow(context).apply {
             setBackgroundDrawable(BitmapDrawable())
             width = WindowManager.LayoutParams.MATCH_PARENT
@@ -47,10 +47,15 @@ class SelectCycleFlagPopup : View.OnClickListener {
         binding.tvCycleSure.setOnClickListener(this)
         binding.tvCycleOnce.setOnClickListener(this)
     }
-
-    override fun onClick(v: View?) {
+    fun checkAnItem (view: TextView){
         val nav_right = mContext.resources.getDrawable(R.drawable.cycle_check)
         nav_right.setBounds(0, 0, nav_right.minimumWidth, nav_right.minimumHeight)
+        if(view.compoundDrawables[2] == null)
+            view.setCompoundDrawables(null, null, nav_right, null)
+        else
+            view.setCompoundDrawables(null, null, null, null)
+    }
+    override fun onClick(v: View?) {
         when(v?.id){
             R.id.tv_cycle_once->{
                 selectCyclePopupOnClickListener?.obtainMessage(9,"")
@@ -59,66 +64,45 @@ class SelectCycleFlagPopup : View.OnClickListener {
                 selectCyclePopupOnClickListener?.obtainMessage(8, "")
             }
             R.id.tv_cycle_1->{
-                if(binding.tvCycle1.compoundDrawables[2] == null)
-                    binding.tvCycle1.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle1.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle1)
                 selectCyclePopupOnClickListener?.obtainMessage(0, "")
             }
             R.id.tv_cycle_2->{
-                if(binding.tvCycle2.compoundDrawables[2] == null)
-                    binding.tvCycle2.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle2.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle2)
                 selectCyclePopupOnClickListener?.obtainMessage(1, "")
             }
             R.id.tv_cycle_3->{
-                if(binding.tvCycle3.compoundDrawables[2] == null)
-                    binding.tvCycle3.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle3.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle3)
                 selectCyclePopupOnClickListener?.obtainMessage(2, "")
             }
             R.id.tv_cycle_4->{
-                if(binding.tvCycle4.compoundDrawables[2] == null)
-                    binding.tvCycle4.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle4.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle4)
                 selectCyclePopupOnClickListener?.obtainMessage(3, "")
             }
             R.id.tv_cycle_5->{
-                if(binding.tvCycle5.compoundDrawables[2] == null)
-                    binding.tvCycle5.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle5.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle5)
                 selectCyclePopupOnClickListener?.obtainMessage(4, "")
             }
             R.id.tv_cycle_6->{
-                if(binding.tvCycle6.compoundDrawables[2] == null)
-                    binding.tvCycle6.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle6.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle6)
                 selectCyclePopupOnClickListener?.obtainMessage(5, "")
             }
             R.id.tv_cycle_7->{
-                if(binding.tvCycle7.compoundDrawables[2] == null)
-                    binding.tvCycle7.setCompoundDrawables(null, null, nav_right, null)
-                else
-                    binding.tvCycle7.setCompoundDrawables(null, null, null, null)
+                checkAnItem(binding.tvCycle7)
                 selectCyclePopupOnClickListener?.obtainMessage(6, "")
             }
             R.id.tv_cycle_sure->{
-                val CheckValue = { tv: TextView ->
+                val checkValue = { tv: TextView ->
                     if(tv.compoundDrawables[2] == null) 0 else 1
                 }
                 val remind =
-                        ( (CheckValue(binding.tvCycle1) shl 1)
-                        + (CheckValue(binding.tvCycle2) shl 2)
-                        + (CheckValue(binding.tvCycle3) shl 3)
-                        + (CheckValue(binding.tvCycle4) shl 4)
-                        + (CheckValue(binding.tvCycle5) shl 5)
-                        + (CheckValue(binding.tvCycle6) shl 6)
-                        + (CheckValue(binding.tvCycle7) shl 7))
+                        ( (checkValue(binding.tvCycle1) shl 0)
+                        + (checkValue(binding.tvCycle2) shl 1)
+                        + (checkValue(binding.tvCycle3) shl 2)
+                        + (checkValue(binding.tvCycle4) shl 3)
+                        + (checkValue(binding.tvCycle5) shl 4)
+                        + (checkValue(binding.tvCycle6) shl 5)
+                        + (checkValue(binding.tvCycle7) shl 6))
                 selectCyclePopupOnClickListener?.obtainMessage(7, remind.toString())
                 dismiss()
             }
@@ -129,8 +113,12 @@ class SelectCycleFlagPopup : View.OnClickListener {
             mPopupWindow.dismiss()
         }
     }
-    fun setOnClickListener(l: SelectCyclePopupOnClickListener){
-        this.selectCyclePopupOnClickListener = l
+    fun setOnClickListener(obtain: (Int, String) -> Unit){
+        this.selectCyclePopupOnClickListener = object : SelectCyclePopupOnClickListener {
+            override fun obtainMessage(flag: Int, ret: String) {
+                obtain(flag, ret)
+            }
+        }
     }
     fun showPopup(rootView: View) {
         // 第一个参数是要将PopupWindow放到的View，第二个参数是位置，第三第四是偏移值

@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:textSize="32dp"
         android:gravity="center"
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
@@ -23,10 +24,11 @@
         android:layout_height="1dp"
         android:layout_marginTop="50dp"/>
 
+    <TextView style="@style/horizontal_line_style"/>
+
     <RelativeLayout
         android:id="@+id/repeat_rl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        style="@style/item_style">
 
         <TextView
             android:id="@+id/tv_repeat"
@@ -41,6 +43,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
+            android:background="@drawable/personal_item_arrow"
             />
 
         <TextView
@@ -54,14 +57,11 @@
             android:textSize="14sp"/>
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
 
+    <TextView style="@style/horizontal_line_style"/>
     <RelativeLayout
         android:id="@+id/ring_rl"
-        style="@style/item_style"
-        >
+        style="@style/item_style">
 
         <TextView
             android:id="@+id/ring_tv"
@@ -75,7 +75,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:background="@drawable/personal_item_arrow" />
 
         <TextView
             android:id="@+id/tv_ring_value"
@@ -86,11 +87,38 @@
             android:layout_toLeftOf="@id/arrow_two"
             android:textSize="20sp"/>
     </RelativeLayout>
+    <TextView style="@style/horizontal_line_style"/>
+    <RelativeLayout
+        android:id="@+id/close_rl"
+        style="@style/item_style"
+        >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        <TextView
+            android:id="@+id/tv_close"
+            style="@style/item_text_style"
+            android:layout_alignParentLeft="true"
+            android:text="关闭模式"/>
 
+        <TextView
+            android:id="@+id/arrow_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/personal_item_arrow"/>
+
+        <TextView
+            android:id="@+id/tv_close_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/arrow_three"
+            android:textSize="20sp"/>
+    </RelativeLayout>
+
+    <TextView style="@style/horizontal_line_style"/>
 
     <Button
         android:id="@+id/set_btn"

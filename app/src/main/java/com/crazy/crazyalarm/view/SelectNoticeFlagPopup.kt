@@ -10,54 +10,58 @@ import android.view.WindowManager
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.crazy.crazyalarm.R
+import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
+import com.crazy.crazyalarm.databinding.SelectNoticeFlagPopWindowBinding
 
-class SelectNoticeFlagPopup @SuppressLint("ClickableViewAccessibility") constructor(context: Context) : OnClickListener {
-    private lateinit var notice_way1: TextView
-    private lateinit var notice_way2: TextView
-    private val mPopupWindow: PopupWindow?
+class SelectNoticeFlagPopup: OnClickListener {
+    var binding: SelectNoticeFlagPopWindowBinding
+    private var mPopupWindow: PopupWindow? = null
     private var selectNoticeWayPopupOnClickListener: SelectNoticeWayPopupOnClickListener? = null
-    private val mContext: Context = context
+    private var mContext: Context
 
-    init {
+    constructor(context: Context){
+        mContext = context
+        binding = SelectNoticeFlagPopWindowBinding.bind(
+            LayoutInflater.from(mContext).inflate(R.layout.select_notice_flag_pop_window, null)
+        )
         mPopupWindow = PopupWindow(context).apply {
             width = WindowManager.LayoutParams.MATCH_PARENT
             height = WindowManager.LayoutParams.MATCH_PARENT
             isTouchable = true
             isFocusable = true
             isOutsideTouchable = true
-            contentView = initViews()
+            contentView = binding.root
             contentView.setOnTouchListener { _, _ ->
                 isFocusable = false
                 dismiss()
                 true
             }
         }
-    }
-
-    private fun initViews(): View {
-        val view = LayoutInflater.from(mContext).inflate(R.layout.select_notice_flag_pop_window, null)
-        notice_way1 = view.findViewById(R.id.tv_drugway_1) as TextView
-        notice_way2 = view.findViewById(R.id.tv_drugway_2) as TextView
-        notice_way1.setOnClickListener(this)
-        notice_way2.setOnClickListener(this)
-        return view
+        binding.tvDrugway1.setOnClickListener(this)
+        binding.tvDrugway2.setOnClickListener(this)
+        binding.tvDrugway3.setOnClickListener(this)
     }
 
     override fun onClick(view: View?) {
         when(view?.id) {
             R.id.tv_drugway_1->
-                selectNoticeWayPopupOnClickListener?.obtainMessage(0)
+                selectNoticeWayPopupOnClickListener?.obtainMessage(AlarmManagerUtil.OnlyVibrator)
             R.id.tv_drugway_2->
-                selectNoticeWayPopupOnClickListener?.obtainMessage(1)
+                selectNoticeWayPopupOnClickListener?.obtainMessage(AlarmManagerUtil.OnlySound)
+            R.id.tv_drugway_3->
+                selectNoticeWayPopupOnClickListener?.obtainMessage(AlarmManagerUtil.BothSoundAndVibrator)
         }
-        dismiss()
     }
-    fun setOnclickListener(l: SelectNoticeWayPopupOnClickListener){
-        this.selectNoticeWayPopupOnClickListener = l
+    fun setOnclickListener(obtain: (AlarmManagerUtil.NoticeFlag) -> Unit){
+        this.selectNoticeWayPopupOnClickListener = object :SelectNoticeWayPopupOnClickListener {
+            override fun obtainMessage(flag: AlarmManagerUtil.NoticeFlag) {
+                obtain(flag)
+            }
+        }
     }
     fun dismiss() {
         if(mPopupWindow?.isShowing == true) {
-            mPopupWindow.dismiss()
+            mPopupWindow?.dismiss()
         }
     }
     fun showPopup(rootView: View){
@@ -66,5 +70,5 @@ class SelectNoticeFlagPopup @SuppressLint("ClickableViewAccessibility") construc
 }
 
 interface SelectNoticeWayPopupOnClickListener {
-    fun obtainMessage(flag: Int)
+    fun obtainMessage(obtain: AlarmManagerUtil.NoticeFlag)
 }

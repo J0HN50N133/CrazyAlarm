@@ -44,19 +44,16 @@ object AlarmManagerUtil {
     object OnlyVibrator : NoticeFlag()
     object BothSoundAndVibrator : NoticeFlag()
     sealed class Mode:Serializable
-    class Norm : Mode() {
+    object Norm : Mode() {
 
     }
-    class Math : Mode() {
+    object Math : Mode() {
 
     }
-    class Memo : Mode() {
+    object Jigsaw : Mode() {
 
     }
-    class Draw : Mode() {
-
-    }
-    class Scan : Mode() {
+    object Scan : Mode() {
 
     }
 
