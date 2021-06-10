@@ -12,27 +12,34 @@ import kotlin.concurrent.thread
 
 object AlarmManagerUtil {
     const val ALARM_ACTION = "com.crazy.crazyalarm.clock"
+
     // To put and get parameter more easily
     const val INTERVALLMILLIS = "intervalMillis"
     const val MSG = "msg"
     const val NOTICEFLAG = "soundOrVibrator"
     const val ID = "id"
     const val MODE = "mode"
+    const val SETTING = "setting"
     const val DayInMillis: Long = 86400000L
-    const val WeekInMillis: Long= 604800000L
+    const val WeekInMillis: Long = 604800000L
 
     fun setAlarmTime(context: Context, timeInMillis: Long, intent: Intent) {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val sender: PendingIntent = PendingIntent.getBroadcast(context,
+        val sender: PendingIntent = PendingIntent.getBroadcast(
+            context,
             intent.getIntExtra(ID, 0),
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            intent, PendingIntent.FLAG_CANCEL_CURRENT
+        )
         val interval = intent.getLongExtra(INTERVALLMILLIS, 0)
         am.setWindow(AlarmManager.RTC_WAKEUP, timeInMillis, interval, sender)
     }
+
     fun cancelAlarm(context: Context, action: String, id: Int) {
         val intent = Intent(action)
-        val pi: PendingIntent = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val pi: PendingIntent = PendingIntent.getBroadcast(
+            context, id,
+            intent, PendingIntent.FLAG_CANCEL_CURRENT
+        )
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(pi)
     }
@@ -41,14 +48,15 @@ object AlarmManagerUtil {
     object Once : CycleFlag()
     object Daily : CycleFlag()
     object Weekly : CycleFlag()
-    
-    const val OnlySound: NoticeFlag= 0
+
+    const val OnlySound: NoticeFlag = 0
     const val OnlyVibrator: NoticeFlag = 1
     const val BothSoundAndVibrator: NoticeFlag = 2
     const val NormMode: Mode = 0
     const val MathMode: Mode = 1
     const val JigsawMode: Mode = 2
     const val ScanMode: Mode = 3
+
     /**
      * @param cycleFlag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复
      * @param hour 时
@@ -68,16 +76,18 @@ object AlarmManagerUtil {
         noticeFlag: NoticeFlag,
         week: Int,
         mode: Mode
-    ){
+    ) {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val calendar:Calendar  = Calendar.getInstance()
+        val calendar: Calendar = Calendar.getInstance()
         var intervalMillis: Long = 0
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH), hour, minute, 10)
-        intervalMillis =  when(cycleFlag) {
-            is Once-> 0
-            is Daily-> DayInMillis
-            is Weekly-> WeekInMillis
+        calendar.set(
+            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH), hour, minute, 10
+        )
+        intervalMillis = when (cycleFlag) {
+            is Once -> 0
+            is Daily -> DayInMillis
+            is Weekly -> WeekInMillis
         }
         val intent = Intent(ALARM_ACTION)
         intent.putExtra(INTERVALLMILLIS, intervalMillis)
@@ -86,13 +96,16 @@ object AlarmManagerUtil {
         intent.putExtra(NOTICEFLAG, noticeFlag)
         intent.putExtra(MODE, mode)
         intent.setPackage(context.packageName)
-        val sender = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        val sender = PendingIntent.getBroadcast(
+            context, id,
+            intent, PendingIntent.FLAG_CANCEL_CURRENT
+        )
         am.setWindow(
             AlarmManager.RTC_WAKEUP,
             calMethod(week, calendar.timeInMillis),
             10,
-            sender)
+            sender
+        )
         Log.e("setAlarm", "闹钟已经设置")
     }
 
@@ -104,31 +117,31 @@ object AlarmManagerUtil {
     private fun calMethod(weekFlag: Int, dateTime: Long): Long {
         var time: Long = 0
         // 重复性闹钟
-        if (weekFlag != 0){
+        if (weekFlag != 0) {
             val c = Calendar.getInstance()
             var week: Int = c.get(Calendar.DAY_OF_WEEK)
-            week = when(week){
-                1->7
-                2->1
-                3->2
-                4->3
-                5->4
-                6->5
-                7->6
-                else-> week
+            week = when (week) {
+                1 -> 7
+                2 -> 1
+                3 -> 2
+                4 -> 3
+                5 -> 4
+                6 -> 5
+                7 -> 6
+                else -> week
             }
             // the alarm day is today
             if (weekFlag == week) {
-                if (dateTime > System.currentTimeMillis()){
+                if (dateTime > System.currentTimeMillis()) {
                     time = dateTime
                 } else {
                     time = dateTime + WeekInMillis
                 }
                 // the day hasn't reach
-            }else if (weekFlag > week) {
-                time = dateTime + (weekFlag - week)* DayInMillis
+            } else if (weekFlag > week) {
+                time = dateTime + (weekFlag - week) * DayInMillis
                 // the day has reached
-            }else if (weekFlag < week) {
+            } else if (weekFlag < week) {
                 time = dateTime + (weekFlag - week) * DayInMillis + WeekInMillis
             }
         } else {
@@ -137,11 +150,34 @@ object AlarmManagerUtil {
             Log.e("currentimemillis", System.currentTimeMillis().toString())
             time = if (dateTime > System.currentTimeMillis()) {
                 dateTime
-            }else {
+            } else {
                 dateTime + DayInMillis
             }
         }
         return time
+    }
+
+    /**
+     * @param id id不能重复
+     */
+    private fun insertId(context: Context, id: Int) {
+        val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+        val idGroup = pref.getString(ID, "") ?: ""
+
+        pref.edit().run {
+            if (idGroup == "")
+                putString(ID, "$id")
+            else
+                putString(ID, "$idGroup,$id")
+            apply()
+        }
+    }
+
+    private fun IsIdInGroup(id: Int, idGroup: String): Boolean {
+        val arr = idGroup.split(',')
+        if (id.toString() in arr)
+            return true
+        return false
     }
 }
 
