@@ -14,4 +14,9 @@
         <item >二进制转十进制</item>
         <item >十进制转二进制</item>
     </string-array>
+
+    <string-array name="mode_type">
+        <item>@string/game_mode_normal</item>
+        <item>@string/game_mode_exchange</item>
+    </string-array>
 </resources>
