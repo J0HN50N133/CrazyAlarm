@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.JigsawMode
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.MathMode
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.NormMode
 import com.crazy.crazyalarm.closeModeActivity.MathActivity
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.JigsawActivity
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -26,11 +28,15 @@ class AlarmReceiver : BroadcastReceiver() {
         val clockIntent = when(mode){
             NormMode -> Intent(context, ClockAlarmActivity::class.java)
             MathMode -> Intent(context, MathActivity::class.java)
+            JigsawMode -> Intent(context, JigsawActivity::class.java)
             else -> Intent(context, ClockAlarmActivity::class.java)
         }
         clockIntent.putExtra(AlarmManagerUtil.MSG, msg)
         clockIntent.putExtra(AlarmManagerUtil.NOTICEFLAG, noticeFlag)
         clockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        Log.d ("start activity","before")
         context.startActivity(clockIntent)
+        Log.d ("start activity", "after")
     }
+
 }

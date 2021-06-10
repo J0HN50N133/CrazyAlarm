@@ -44,7 +44,7 @@ class MathActivity : BasicRingActivity() {
                 //Ture
             }
             else{
-                Toast.//False
+//False
             }
 
         }
