@@ -13,6 +13,7 @@ import com.crazy.crazyalarm.R
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
 import com.crazy.crazyalarm.databinding.SelectNoticeFlagPopWindowBinding
 
+typealias NoticeFlag = Int
 class SelectNoticeFlagPopup: OnClickListener {
     var binding: SelectNoticeFlagPopWindowBinding
     private var mPopupWindow: PopupWindow? = null
@@ -52,9 +53,9 @@ class SelectNoticeFlagPopup: OnClickListener {
                 selectNoticeWayPopupOnClickListener?.obtainMessage(AlarmManagerUtil.BothSoundAndVibrator)
         }
     }
-    fun setOnclickListener(obtain: (AlarmManagerUtil.NoticeFlag) -> Unit){
+    fun setOnclickListener(obtain: (NoticeFlag) -> Unit){
         this.selectNoticeWayPopupOnClickListener = object :SelectNoticeWayPopupOnClickListener {
-            override fun obtainMessage(flag: AlarmManagerUtil.NoticeFlag) {
+            override fun obtainMessage(flag: NoticeFlag) {
                 obtain(flag)
             }
         }
@@ -70,5 +71,5 @@ class SelectNoticeFlagPopup: OnClickListener {
 }
 
 interface SelectNoticeWayPopupOnClickListener {
-    fun obtainMessage(obtain: AlarmManagerUtil.NoticeFlag)
+    fun obtainMessage(obtain: NoticeFlag)
 }

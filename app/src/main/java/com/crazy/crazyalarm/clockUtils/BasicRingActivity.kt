@@ -10,29 +10,29 @@ import com.crazy.crazyalarm.R
 open class BasicRingActivity: AppCompatActivity(){
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
-    fun giveNotice(noticeFlag: AlarmManagerUtil.NoticeFlag){
+    fun giveNotice(noticeFlag: NoticeFlag){
         when(noticeFlag) {
-            is AlarmManagerUtil.OnlySound -> {
+            AlarmManagerUtil.OnlySound -> {
                 ring()
             }
-            is AlarmManagerUtil.OnlyVibrator -> {
+            AlarmManagerUtil.OnlyVibrator -> {
                 vibrate()
             }
-            is AlarmManagerUtil.BothSoundAndVibrator -> {
+            AlarmManagerUtil.BothSoundAndVibrator -> {
                 ring()
                 vibrate()
             }
         }
     }
-    fun stopNotice(noticeFlag: AlarmManagerUtil.NoticeFlag){
+    fun stopNotice(noticeFlag: NoticeFlag){
         when(noticeFlag){
-            is AlarmManagerUtil.OnlySound -> {
+            AlarmManagerUtil.OnlySound -> {
                 mediaPlayer?.stop()
             }
-            is AlarmManagerUtil.OnlyVibrator -> {
+            AlarmManagerUtil.OnlyVibrator -> {
                 vibrator?.cancel()
             }
-            is AlarmManagerUtil.BothSoundAndVibrator -> {
+            AlarmManagerUtil.BothSoundAndVibrator -> {
                 mediaPlayer?.stop()
                 vibrator?.cancel()
             }

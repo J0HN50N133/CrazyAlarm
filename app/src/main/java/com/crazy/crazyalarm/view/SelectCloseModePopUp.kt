@@ -9,6 +9,7 @@ import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
 import com.crazy.crazyalarm.databinding.SelectCloseModePopWindowBinding
 
 @Suppress("DEPRECATION")
+typealias Mode = Int
 class SelectCloseModePopUp : View.OnClickListener{
     private var binding: SelectCloseModePopWindowBinding
     private lateinit var mPopupWindow :PopupWindow
@@ -40,16 +41,16 @@ class SelectCloseModePopUp : View.OnClickListener{
     override fun onClick(view: View) {
         when(view.id){
             R.id.tv_norm_mode->{
-                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.Norm)
+                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.NormMode)
             }
             R.id.tv_jigsaw_mode->{
-                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.Jigsaw)
+                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.JigsawMode)
             }
             R.id.tv_math_mode->{
-                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.Math)
+                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.MathMode)
             }
             R.id.tv_scan_mode->{
-                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.Scan)
+                selectCloseModeOnClickListener?.obtainMsg(AlarmManagerUtil.ScanMode)
             }
         }
     }
@@ -57,9 +58,9 @@ class SelectCloseModePopUp : View.OnClickListener{
         if (mPopupWindow.isShowing)
             mPopupWindow.dismiss()
     }
-    fun setOnClickListener(obtain: (AlarmManagerUtil.Mode)->Unit){
+    fun setOnClickListener(obtain: (Mode)->Unit){
         selectCloseModeOnClickListener = object : SelectCloseModeOnClickListener {
-            override fun obtainMsg(mode: AlarmManagerUtil.Mode) {
+            override fun obtainMsg(mode: Mode) {
                 obtain(mode)
             }
         }
@@ -70,5 +71,5 @@ class SelectCloseModePopUp : View.OnClickListener{
 }
 
 interface SelectCloseModeOnClickListener{
-    fun obtainMsg(mode: AlarmManagerUtil.Mode)
+    fun obtainMsg(mode: Mode)
 }

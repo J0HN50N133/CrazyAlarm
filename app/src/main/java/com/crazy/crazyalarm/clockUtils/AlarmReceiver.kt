@@ -6,6 +6,8 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.Norm
+import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.NormMode
+import org.json.JSONObject
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -13,8 +15,8 @@ class AlarmReceiver : BroadcastReceiver() {
         Log.e("Broadcast", "Receive Broadcast")
         val msg = intent.getStringExtra(AlarmManagerUtil.MSG)
         val intervalMillis = intent.getLongExtra(AlarmManagerUtil.INTERVALLMILLIS, 0)
-        val noticeFlag = intent.getSerializableExtra(AlarmManagerUtil.NOTICEFLAG) as AlarmManagerUtil.NoticeFlag
-        val mode = intent.getSerializableExtra(AlarmManagerUtil.MODE) as AlarmManagerUtil.Mode
+        val mode = intent.getIntExtra(AlarmManagerUtil.MODE, AlarmManagerUtil.NormMode)
+        val noticeFlag = intent.getIntExtra(AlarmManagerUtil.NOTICEFLAG, AlarmManagerUtil.BothSoundAndVibrator)
         if (intervalMillis != 0L) {
             // 重复闹钟解决方案: 本次闹钟响的同时设置下一次闹钟
             AlarmManagerUtil.setAlarmTime(context,
@@ -23,7 +25,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // TODO: 闹钟响铃后模式在这里决定
         val clockIntent = when(mode){
-            is Norm -> Intent(context, ClockAlarmActivity::class.java)
+            NormMode -> Intent(context, ClockAlarmActivity::class.java)
             else -> Intent(context, ClockAlarmActivity::class.java)
         }
         clockIntent.putExtra(AlarmManagerUtil.MSG, msg)
