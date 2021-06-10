@@ -4,8 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import java.io.Serializable
 import java.util.*
+import kotlin.concurrent.thread
 
 object AlarmManagerUtil {
     const val ALARM_ACTION = "com.crazy.crazyalarm.clock"
@@ -23,14 +25,14 @@ object AlarmManagerUtil {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val sender: PendingIntent = PendingIntent.getBroadcast(context,
             intent.getIntExtra(ID, 0),
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            intent, PendingIntent.FLAG_UPDATE_CURRENT)
         val interval = intent.getLongExtra(INTERVALLMILLIS, 0)
         am.setWindow(AlarmManager.RTC_WAKEUP, timeInMillis, interval, sender)
     }
     fun cancelAlarm(context: Context, action: String, id: Int) {
         val intent = Intent(action)
         val pi: PendingIntent = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            intent, PendingIntent.FLAG_UPDATE_CURRENT)
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(pi)
     }
@@ -76,7 +78,7 @@ object AlarmManagerUtil {
         noticeFlag: NoticeFlag,
         week: Int,
         mode: Mode
-    ) {
+    ) :Intent{
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val calendar:Calendar  = Calendar.getInstance()
         var intervalMillis: Long = 0
@@ -93,11 +95,16 @@ object AlarmManagerUtil {
         intent.putExtra(ID, id)
         intent.putExtra(NOTICEFLAG, noticeFlag)
         intent.putExtra(MODE, mode)
+        intent.setPackage(context.packageName)
         val sender = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            intent, PendingIntent.FLAG_UPDATE_CURRENT)
         am.setWindow(
             AlarmManager.RTC_WAKEUP,
-            calMethod(week, calendar.timeInMillis), intervalMillis, sender)
+            calMethod(week, calendar.timeInMillis),
+            10,
+            sender)
+        Log.e("setAlarm", "闹钟已经设置")
+        return intent
     }
 
     /**
@@ -112,7 +119,7 @@ object AlarmManagerUtil {
             val c = Calendar.getInstance()
             var week: Int = c.get(Calendar.DAY_OF_WEEK)
             week = when(week){
-
+                1->7
                 2->1
                 3->2
                 4->3
@@ -124,7 +131,7 @@ object AlarmManagerUtil {
             // the alarm day is today
             if (weekFlag == week) {
                 if (dateTime > System.currentTimeMillis()){
-                    time = dateTime;
+                    time = dateTime
                 } else {
                     time = dateTime + WeekInMillis
                 }
@@ -137,6 +144,8 @@ object AlarmManagerUtil {
             }
         } else {
             // 一次性闹钟
+            Log.e("dateTime", dateTime.toString())
+            Log.e("currentimemillis", System.currentTimeMillis().toString())
             time = if (dateTime > System.currentTimeMillis()) {
                 dateTime
             }else {

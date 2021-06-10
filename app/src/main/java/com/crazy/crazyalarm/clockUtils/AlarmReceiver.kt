@@ -3,11 +3,14 @@ package com.crazy.crazyalarm.clockUtils
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
+import android.widget.Toast
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.Norm
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.e("Broadcast", "Receive Broadcast")
         val msg = intent.getStringExtra(AlarmManagerUtil.MSG)
         val intervalMillis = intent.getLongExtra(AlarmManagerUtil.INTERVALLMILLIS, 0)
         val noticeFlag = intent.getSerializableExtra(AlarmManagerUtil.NOTICEFLAG) as AlarmManagerUtil.NoticeFlag

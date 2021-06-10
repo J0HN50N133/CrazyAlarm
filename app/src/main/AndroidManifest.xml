@@ -28,7 +28,8 @@
         <activity android:name="com.huawei.hms.hmsscankit.ScanKitActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".closeModeActivity.ScanActivity" />
-        <activity android:name=".SetClockActivity"></activity>
+        <activity android:name=".SetClockActivity" />
+        <activity android:name=".clockUtils.ClockAlarmActivity"/>
 
         <receiver
             android:name=".clockUtils.AlarmReceiver"
