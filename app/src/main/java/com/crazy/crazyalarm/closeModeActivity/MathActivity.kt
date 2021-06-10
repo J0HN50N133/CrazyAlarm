@@ -2,6 +2,7 @@ package com.crazy.crazyalarm.closeModeActivity
 
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
 import com.crazy.crazyalarm.clockUtils.BasicRingActivity
@@ -26,9 +27,9 @@ class MathActivity : BasicRingActivity() {
         val noticeFlag = intent.getIntExtra(AlarmManagerUtil.NOTICEFLAG, AlarmManagerUtil.BothSoundAndVibrator)
         giveNotice(noticeFlag)
         sendRequestWithOkHttp(Configuration.MathConf.modeCode)
-        binding.sendRequestBtn.setOnClickListener {
-            sendRequestWithOkHttp(Configuration.MathConf.modeCode)
-        }
+//        binding.sendRequestBtn.setOnClickListener {
+//            sendRequestWithOkHttp(Configuration.MathConf.modeCode)
+//        }
         binding.Selected.setOnCheckedChangeListener{ group, checkedId ->
             ans = when(checkedId) {
                 binding.choose1.id -> "A"
@@ -41,10 +42,18 @@ class MathActivity : BasicRingActivity() {
         binding.checkAnswers.setOnClickListener{
             if(ans == trueAnswer){
                 stopNotice(noticeFlag)
-                //Ture
+                finish()
+             //Ture
             }
             else{
-                Toast.//False
+                Toast.makeText(this, "回答错误!", Toast.LENGTH_SHORT).show()
+                //False
+                sendRequestWithOkHttp(Configuration.MathConf.modeCode)
+                runOnUiThread {
+                    binding.choose1.isChecked = false
+                    binding.choose2.isChecked = false
+                    binding.choose3.isChecked = false
+                }
             }
 
         }

@@ -38,6 +38,7 @@ open class BasicRingActivity: AppCompatActivity(){
             }
         }
     }
+
     private fun ring(){
         mediaPlayer = MediaPlayer.create(this, R.raw.beep)
         mediaPlayer?.isLooping = true
