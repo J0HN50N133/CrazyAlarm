@@ -11,7 +11,7 @@ class Configuration {
     }
 
     object MathConf {
-        var modeCode =31
+        var modeCode =11
     }
 
     object JigsawConf {
