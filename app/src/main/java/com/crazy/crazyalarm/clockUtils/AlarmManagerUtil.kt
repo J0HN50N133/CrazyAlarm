@@ -56,6 +56,7 @@ object AlarmManagerUtil {
     const val MathMode: Mode = 1
     const val JigsawMode: Mode = 2
     const val ScanMode: Mode = 3
+    const val NothingMode: Mode = 4
 
     /**
      * @param cycleFlag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复

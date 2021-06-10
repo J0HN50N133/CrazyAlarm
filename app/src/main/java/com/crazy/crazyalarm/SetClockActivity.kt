@@ -37,7 +37,7 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
         val currMinute = instance.get(Calendar.MINUTE)
         val onTimeSetListener = { _: TimePicker, _hour:Int, _minute: Int ->
             runOnUiThread{
-                binding.dateTv.text = "$_hour : $_minute"
+                binding.dateTv.text = String.format("%02d:%02d",_hour, _minute)
             }
             hour = _hour
             minute = _minute
