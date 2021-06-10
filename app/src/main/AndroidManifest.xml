@@ -30,6 +30,7 @@
         <activity android:name=".closeModeActivity.ScanActivity" />
         <activity android:name=".SetClockActivity" />
         <activity android:name=".clockUtils.ClockAlarmActivity"/>
+        <activity android:name=".closeModeActivity.MathActivity"/>
 
         <receiver
             android:name=".clockUtils.AlarmReceiver"

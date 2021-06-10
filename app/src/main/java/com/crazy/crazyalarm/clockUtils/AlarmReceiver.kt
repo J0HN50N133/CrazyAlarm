@@ -4,10 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
-import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.Norm
+import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.MathMode
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.NormMode
-import org.json.JSONObject
+import com.crazy.crazyalarm.closeModeActivity.MathActivity
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -26,6 +25,7 @@ class AlarmReceiver : BroadcastReceiver() {
         // TODO: 闹钟响铃后模式在这里决定
         val clockIntent = when(mode){
             NormMode -> Intent(context, ClockAlarmActivity::class.java)
+            MathMode -> Intent(context, MathActivity::class.java)
             else -> Intent(context, ClockAlarmActivity::class.java)
         }
         clockIntent.putExtra(AlarmManagerUtil.MSG, msg)

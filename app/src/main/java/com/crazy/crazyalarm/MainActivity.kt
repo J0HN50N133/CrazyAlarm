@@ -19,8 +19,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         var list = mutableListOf<Clock>()
-
         val calendar = Calendar.getInstance()
+        binding.fab.setOnClickListener {
+            val intent = Intent(this, SetClockActivity::class.java)
+            startActivity(intent)
+        }
 //        binding.button2.setOnClickListener {
 //            val intent = AlarmManagerUtil.setAlarm(
 //                this,
