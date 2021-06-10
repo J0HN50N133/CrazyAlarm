@@ -29,21 +29,21 @@ public class JigsawActivity extends BasicRingActivity implements PuzzleGame.Game
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-//        initView();
-//        initListener();
-//        Intent it = new Intent(this, MainActivity.class);
-//        giveNotice(it.getIntExtra(AlarmManagerUtil.NOTICEFLAG, AlarmManagerUtil.BothSoundAndVibrator));
+        initView();
+        initListener();
+        Intent it = new Intent(this, MainActivity.class);
+        giveNotice(it.getIntExtra(AlarmManagerUtil.NOTICEFLAG, AlarmManagerUtil.BothSoundAndVibrator));
     }
 
 
-//    private void initView() {
-//        puzzleLayout = (PuzzleLayout) findViewById(R.id.puzzleLayout);
-//        puzzleGame = new PuzzleGame(this, puzzleLayout);
-//        srcImg = (ImageView) findViewById(R.id.ivSrcImg);
-//        tvLevel = (TextView) findViewById(R.id.tvLevel);
-//        tvLevel.setText("难度等级：" + puzzleGame.getLevel());
-//        srcImg.setImageBitmap(Utils.readBitmap(getApplicationContext(), puzzleLayout.getRes(), 4));
-//    }
+    private void initView() {
+        puzzleLayout = (PuzzleLayout) findViewById(R.id.puzzleLayout);
+        puzzleGame = new PuzzleGame(this, puzzleLayout);
+        srcImg = (ImageView) findViewById(R.id.ivSrcImg);
+        tvLevel = (TextView) findViewById(R.id.tvLevel);
+        tvLevel.setText("难度等级：" + puzzleGame.getLevel());
+        srcImg.setImageBitmap(Utils.readBitmap(getApplicationContext(), puzzleLayout.getRes(), 4));
+    }
 
 
     private void initListener() {
