@@ -3,7 +3,6 @@ package com.crazy.crazyalarm.closeModeActivity
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
 import com.crazy.crazyalarm.clockUtils.BasicRingActivity
 import com.crazy.crazyalarm.clockUtils.Configuration
@@ -71,8 +70,8 @@ class MathActivity : BasicRingActivity() {
             if (responseData != null) {
                 val jsonObject = JSONObject(responseData)
                 val problem = problemParse(jsonObject.getString(PROBLEM), type_id)
-                val answer = jsonObject.getString(ANSWER).toFloat()
-                var arr = setanswer(answer)
+                val answer = jsonObject.getString(ANSWER)
+                var arr = setanswer(answer, type_id)
                 showMathProblem(problem, arr)
                 runOnUiThread{
 
@@ -83,16 +82,25 @@ class MathActivity : BasicRingActivity() {
         }
     }
 }
-    fun setanswer(answer: Float): MutableList<Float>{
-        var ans = mutableListOf(answer)
-        var random1 = 0
-        var random2 = 0
-        while(random1==0 || random2 == 0 || random1 == random2){
-            random1 = (-5..5).random()
-            random2 = (-5..5).random()
+    fun setanswer(answer: String, type_id: Int): MutableList<String>{
+        val noise = {num: String-> (num.toFloat()+(-5..5).random().toFloat()).toString() }
+        val ans = mutableListOf(answer)
+        var random1 = ""
+        var random2 = ""
+        if (type_id == 11){
+            val fractionArr = answer.split("/")
+            random1 = noise(fractionArr[0])+"/"+noise(fractionArr[1])
+            random2 = noise(fractionArr[0])+"/"+noise(fractionArr[1])
+        }else{
+            random1 = noise(answer)
+            random2 = noise(answer)
+            while(random1 == random2){
+                var random1 = noise(answer)
+                var random2 = noise(answer)
+            }
         }
-        ans.add(answer+random1.toFloat())
-        ans.add(answer+random2.toFloat())
+        ans.add(random1)
+        ans.add(random2)
         ans.shuffle()
         for(index in 0..2){
             if(answer == ans[index]){
@@ -107,7 +115,7 @@ class MathActivity : BasicRingActivity() {
         return ans
     }
 
-    private fun showMathProblem(problem: String, arr: MutableList<Float>) {
+    private fun showMathProblem(problem: String, arr: MutableList<String>) {
         runOnUiThread {
             // 在这里进行UI操作，将结果显示到界面上
             val html="\n" +
@@ -135,15 +143,26 @@ class MathActivity : BasicRingActivity() {
                  "</html>"
             binding.webView.settings.javaScriptEnabled=true
             binding.webView.loadDataWithBaseURL("",html,"text/html","UTF-8","")
-            binding.answer1.text= arr[0].toString()
-            binding.answer2.text= arr[1].toString()
-            binding.answer3.text= arr[2].toString()
+            binding.answer1.text= arr[0]
+            binding.answer2.text= arr[1]
+            binding.answer3.text= arr[2]
         }
     }
     // 把问题字符串进行转换
     private fun problemParse(problem: String?, type_id: Int): String {
         return "\$$problem\$"
     }
+    // 对答案进行解析
+//    private fun answerParse(answer: String, type_id: Int): String {
+//        when(type_id){
+//            11->{
+//
+//            }
+//            else->{
+//                return answer
+//            }
+//        }
+//    }
 }
 
 
