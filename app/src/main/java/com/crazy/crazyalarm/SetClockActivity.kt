@@ -37,7 +37,7 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
         val currMinute = instance.get(Calendar.MINUTE)
         val onTimeSetListener = { _: TimePicker, _hour:Int, _minute: Int ->
             runOnUiThread{
-                binding.dateTv.text = "$_hour : $_minute"
+                binding.dateTv.text = String.format("%02d:%02d",_hour, _minute)
             }
             hour = _hour
             minute = _minute
@@ -192,13 +192,16 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
         if (hour != null && minute != null){
             when(cycle){
                 is AlarmManagerUtil.Daily,AlarmManagerUtil.Once->{
+                    val id = AlarmManagerUtil.generateId(this)
                     AlarmManagerUtil.setAlarm(
                         this,
                         hour!!,
                         minute!!,
                         cycle,
                         "闹钟响了",
-                        0,
+                        id,
+                        id,
+                        cycleDaysOfWeek!!,
                         noticeFlag,
                         0,
                         mode
@@ -207,18 +210,37 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
                 is AlarmManagerUtil.Weekly->{
                     val weekStr = parseRepeat(cycleDaysOfWeek!!, 1)
                     val days = weekStr.split(",")
+                    val pid = AlarmManagerUtil.generateId(this)
                     for((i, day) in days.withIndex()){
-                        AlarmManagerUtil.setAlarm(
-                            this,
-                            hour!!,
-                            minute!!,
-                            cycle,
-                            "闹钟响了",
-                            i,
-                            noticeFlag,
-                            day.toInt(),
-                            mode
-                        )
+                        if(i == 0){
+                            AlarmManagerUtil.setAlarm(
+                                this,
+                                hour!!,
+                                minute!!,
+                                cycle,
+                                "闹钟响了",
+                                pid,
+                                pid,
+                                cycleDaysOfWeek!!,
+                                noticeFlag,
+                                day.toInt(),
+                                mode
+                            )
+                        } else{
+                            AlarmManagerUtil.setAlarm(
+                                this,
+                                hour!!,
+                                minute!!,
+                                cycle,
+                                "闹钟响了",
+                                AlarmManagerUtil.generateId(this),
+                                pid,
+                                cycleDaysOfWeek!!,
+                                noticeFlag,
+                                day.toInt(),
+                                mode
+                            )
+                        }
                     }
                 }
             }
