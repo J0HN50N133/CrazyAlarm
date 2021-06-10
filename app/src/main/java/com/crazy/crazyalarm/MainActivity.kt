@@ -20,9 +20,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         loadConfiguration()
-        var list = mutableListOf<ClockItem>()
-
-
+        var list = mutableListOf<Clock>()
+        val calendar = Calendar.getInstance()
+        binding.fab.setOnClickListener {
+            val intent = Intent(this, SetClockActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     fun loadConfiguration() {
