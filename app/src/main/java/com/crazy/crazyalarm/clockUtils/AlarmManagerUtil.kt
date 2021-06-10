@@ -7,7 +7,9 @@ import android.content.Intent
 import android.util.Log
 import org.json.JSONObject
 import java.io.Serializable
+import java.lang.reflect.Method
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.concurrent.thread
 
 object AlarmManagerUtil {
@@ -18,11 +20,14 @@ object AlarmManagerUtil {
     const val MSG = "msg"
     const val NOTICEFLAG = "soundOrVibrator"
     const val ID = "id"
+    const val REPEAT = "repeat"
+    const val IDARR = "idarr"
+    const val PARENTID = "parentid"
     const val MODE = "mode"
     const val SETTING = "setting"
     const val DayInMillis: Long = 86400000L
     const val WeekInMillis: Long = 604800000L
-
+    val rand = Random()
     fun setAlarmTime(context: Context, timeInMillis: Long, intent: Intent) {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val sender: PendingIntent = PendingIntent.getBroadcast(
@@ -34,14 +39,16 @@ object AlarmManagerUtil {
         am.setWindow(AlarmManager.RTC_WAKEUP, timeInMillis, interval, sender)
     }
 
-    fun cancelAlarm(context: Context, action: String, id: Int) {
-        val intent = Intent(action)
-        val pi: PendingIntent = PendingIntent.getBroadcast(
-            context, id,
-            intent, PendingIntent.FLAG_CANCEL_CURRENT
-        )
-        val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.cancel(pi)
+    fun cancelAlarm(context: Context, pid: Int) {
+        val intent = Intent(ALARM_ACTION)
+        val idList = getChildOf(context, pid)
+        for(id in idList){
+            val pi: PendingIntent = PendingIntent.getBroadcast(
+                context, id,
+                intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            am.cancel(pi)
+        }
     }
 
     sealed class CycleFlag
@@ -66,6 +73,7 @@ object AlarmManagerUtil {
      * @param id 闹钟id
      * @param noticeFlag 震动还是声音
      * @param week week=0表示一次性闹钟，非0的情况下是几就表示以一周为周期重复响铃
+     * @param repeat 一周内哪些天重复, -1为仅一次, 127为每天
      */
     fun setAlarm(
         context: Context,
@@ -74,6 +82,8 @@ object AlarmManagerUtil {
         cycleFlag: CycleFlag,
         prompt: String,
         id: Int,
+        parentID: Int,
+        repeat: Int,
         noticeFlag: NoticeFlag,
         week: Int,
         mode: Mode
@@ -94,8 +104,10 @@ object AlarmManagerUtil {
         intent.putExtra(INTERVALLMILLIS, intervalMillis)
         intent.putExtra(MSG, prompt)
         intent.putExtra(ID, id)
+        intent.putExtra(PARENTID, parentID)
         intent.putExtra(NOTICEFLAG, noticeFlag)
         intent.putExtra(MODE, mode)
+        intent.putExtra(REPEAT, repeat)
         intent.setPackage(context.packageName)
         val sender = PendingIntent.getBroadcast(
             context, id,
@@ -158,23 +170,98 @@ object AlarmManagerUtil {
         return time
     }
 
+    fun generateId(context: Context): Int{
+        var id = rand.nextInt()
+        while (isIdInGroup(context, id)){
+            id = rand.nextInt()
+        }
+        return id
+    }
+    private fun getChildOf(context: Context, pid: Int): MutableList<Int> {
+        val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+        val idGroup = pref.getString(IDARR, "")
+        val idarr = idGroup?.split(",")
+        var ChildIDList = mutableListOf<Int>()
+        val intent = Intent(ALARM_ACTION)
+        (idarr)?.forEach { id ->
+            val broadcast = PendingIntent.getBroadcast(
+                context, id.toInt(),
+                intent, PendingIntent.FLAG_CANCEL_CURRENT
+            )
+            val intent = getIntent(broadcast)
+            if (intent.getIntExtra(PARENTID, -1) == pid){
+                ChildIDList.add(intent.getIntExtra(ID, -1))
+            }
+        }
+        return ChildIDList
+    }
     /**
      * @param id id不能重复
      */
     private fun insertId(context: Context, id: Int) {
         val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
-        val idGroup = pref.getString(ID, "") ?: ""
+        val idGroup = pref.getString(IDARR, "") ?: ""
 
         pref.edit().run {
             if (idGroup == "")
-                putString(ID, "$id")
+                putString(IDARR, "$id")
             else
-                putString(ID, "$idGroup,$id")
+                putString(IDARR, "$idGroup,$id")
             apply()
         }
     }
+    fun getAllParentID(context: Context): MutableList<Int> {
+        val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+        val idGroup = pref.getString(IDARR, "")
+        val idarr = idGroup?.split(",")
+        var ParentIDList = mutableListOf<Int>()
+        val intent = Intent(ALARM_ACTION)
+        (idarr)?.forEach { id ->
+            val broadcast = PendingIntent.getBroadcast(
+                context, id.toInt(),
+                intent, PendingIntent.FLAG_CANCEL_CURRENT
+            )
+            val intent = getIntent(broadcast)
+            if (intent.getIntExtra(ID, -1) == intent.getIntExtra(PARENTID, -100)){
+                ParentIDList.add(intent.getIntExtra(ID, -1))
+            }
+        }
+        return ParentIDList
+    }
+    public fun getIntent(context: Context, id: Int): Intent{
+        val broadcast = PendingIntent.getBroadcast(
+            context, id,
+            Intent(ALARM_ACTION), PendingIntent.FLAG_CANCEL_CURRENT
+        )
+        return getIntent(broadcast)
+    }
+    private fun getIntent(pendingIntent: PendingIntent): Intent{
+        val getIntentOfPend = PendingIntent::class.java.getDeclaredMethod("getIntent")
+        return getIntentOfPend.invoke(pendingIntent) as Intent
+    }
+    private fun deleteID(context: Context, id: Int) {
+        if(!isIdInGroup(context, id)){
+            return
+        }else{
+            val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+            val idGroup = pref.getString(IDARR, "") ?: ""
+            var idarr = idGroup.split(",")
+            var newidarr = mutableListOf<String>()
+            for (s in idarr) {
+                if (s.toInt() != id){
+                    newidarr.add(s)
+                }
+            }
+            pref.edit().run {
+                val joinToString = newidarr.joinToString(",")
+                putString(IDARR, joinToString)
+            }
+        }
+    }
 
-    private fun IsIdInGroup(id: Int, idGroup: String): Boolean {
+    private fun isIdInGroup(context: Context, id: Int): Boolean {
+        val pref = context.getSharedPreferences(SETTING, Context.MODE_PRIVATE)
+        val idGroup = pref.getString(IDARR, "") ?: ""
         val arr = idGroup.split(',')
         if (id.toString() in arr)
             return true
