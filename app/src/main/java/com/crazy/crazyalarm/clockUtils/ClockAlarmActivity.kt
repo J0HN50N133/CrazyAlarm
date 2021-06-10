@@ -4,10 +4,6 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Vibrator
 import com.crazy.crazyalarm.R
-import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.BothSoundAndVibrator
-import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.NoticeFlag
-import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.OnlySound
-import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil.OnlyVibrator
 
 class ClockAlarmActivity: BasicRingActivity() {
     private var mediaPlayer: MediaPlayer? = null
@@ -17,7 +13,7 @@ class ClockAlarmActivity: BasicRingActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_clock_alarm)
         val msg = intent.getStringExtra(AlarmManagerUtil.MSG) as String
-        val noticeFlag = intent.getSerializableExtra(AlarmManagerUtil.NOTICEFLAG) as AlarmManagerUtil.NoticeFlag
+        val noticeFlag = intent.getIntExtra(AlarmManagerUtil.NOTICEFLAG, AlarmManagerUtil.BothSoundAndVibrator)
         showDialogInBroadcastReceiver(msg, noticeFlag)
     }
 

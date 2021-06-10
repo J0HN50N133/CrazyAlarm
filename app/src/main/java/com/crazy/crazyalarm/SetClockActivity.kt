@@ -1,7 +1,6 @@
 package com.crazy.crazyalarm
 
 import android.app.TimePickerDialog
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,14 +14,17 @@ import com.crazy.crazyalarm.view.SelectCycleFlagPopup
 import com.crazy.crazyalarm.view.SelectNoticeFlagPopup
 import java.util.*
 
+typealias NoticeFlag = Int
+typealias Mode = Int
+
 class SetClockActivity : AppCompatActivity() , View.OnClickListener{
     private lateinit var binding: ActivitySetClockBinding
     private lateinit var timePickerDialog: TimePickerDialog
     companion object{
         private var cycle: AlarmManagerUtil.CycleFlag = AlarmManagerUtil.Once
         private var cycleDaysOfWeek: Int? = null
-        private var ring: AlarmManagerUtil.NoticeFlag = AlarmManagerUtil.BothSoundAndVibrator
-        private var mode: AlarmManagerUtil.Mode = AlarmManagerUtil.Norm
+        private var noticeFlag: NoticeFlag = AlarmManagerUtil.BothSoundAndVibrator
+        private var mode: Mode = AlarmManagerUtil.NormMode
         private var hour: Int? = null
         private var minute: Int? = null
     }
@@ -52,28 +54,27 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
         runOnUiThread {
             noticePopup.showPopup(binding.root)
         }
-        noticePopup.setOnclickListener { flag: AlarmManagerUtil.NoticeFlag ->
+        noticePopup.setOnclickListener { flag: NoticeFlag ->
             when (flag) {
                 AlarmManagerUtil.OnlyVibrator -> {
                     runOnUiThread {
                         binding.tvRingValue.text = "震动"
                     }
-                    ring = AlarmManagerUtil.OnlyVibrator
+                    noticeFlag = AlarmManagerUtil.OnlyVibrator
                 }
                 AlarmManagerUtil.OnlySound -> {
                     runOnUiThread {
                         binding.tvRingValue.text = "铃声"
                     }
-                    ring = AlarmManagerUtil.OnlySound
+                    noticeFlag = AlarmManagerUtil.OnlySound
                 }
                 AlarmManagerUtil.BothSoundAndVibrator->{
                     runOnUiThread {
                         binding.tvRingValue.text = "震动和铃声"
                     }
-                    ring = AlarmManagerUtil.BothSoundAndVibrator
+                    noticeFlag = AlarmManagerUtil.BothSoundAndVibrator
                 }
             }
-            ring = flag
             runOnUiThread {
                 noticePopup.dismiss()
             }
@@ -198,7 +199,7 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
                         cycle,
                         "闹钟响了",
                         0,
-                        ring,
+                        noticeFlag,
                         0,
                         mode
                     )
@@ -214,7 +215,7 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
                             cycle,
                             "闹钟响了",
                             i,
-                            ring,
+                            noticeFlag,
                             day.toInt(),
                             mode
                         )
@@ -231,24 +232,24 @@ class SetClockActivity : AppCompatActivity() , View.OnClickListener{
         runOnUiThread{
             closePopup.showPopup(binding.root)
         }
-        closePopup.setOnClickListener { flag:AlarmManagerUtil.Mode->
+        closePopup.setOnClickListener { flag:Mode->
             when (flag) {
-                is AlarmManagerUtil.Norm -> {
+                AlarmManagerUtil.NormMode -> {
                     runOnUiThread{
                         binding.tvCloseValue.setText("普通模式")
                     }
                 }
-                is AlarmManagerUtil.Math -> {
+                AlarmManagerUtil.MathMode -> {
                     runOnUiThread{
                         binding.tvCloseValue.setText("数学模式")
                     }
                 }
-                is AlarmManagerUtil.Jigsaw -> {
+                AlarmManagerUtil.JigsawMode -> {
                     runOnUiThread{
                         binding.tvCloseValue.setText("拼图模式")
                     }
                 }
-                is AlarmManagerUtil.Scan -> {
+                AlarmManagerUtil.ScanMode -> {
                     runOnUiThread{
                         binding.tvCloseValue.setText("扫描模式")
                     }

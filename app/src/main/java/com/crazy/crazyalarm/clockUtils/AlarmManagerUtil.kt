@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import org.json.JSONObject
 import java.io.Serializable
 import java.util.*
 import kotlin.concurrent.thread
@@ -17,7 +18,6 @@ object AlarmManagerUtil {
     const val NOTICEFLAG = "soundOrVibrator"
     const val ID = "id"
     const val MODE = "mode"
-
     const val DayInMillis: Long = 86400000L
     const val WeekInMillis: Long= 604800000L
 
@@ -25,14 +25,14 @@ object AlarmManagerUtil {
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val sender: PendingIntent = PendingIntent.getBroadcast(context,
             intent.getIntExtra(ID, 0),
-            intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            intent, PendingIntent.FLAG_CANCEL_CURRENT)
         val interval = intent.getLongExtra(INTERVALLMILLIS, 0)
         am.setWindow(AlarmManager.RTC_WAKEUP, timeInMillis, interval, sender)
     }
     fun cancelAlarm(context: Context, action: String, id: Int) {
         val intent = Intent(action)
         val pi: PendingIntent = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            intent, PendingIntent.FLAG_CANCEL_CURRENT)
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(pi)
     }
@@ -41,12 +41,14 @@ object AlarmManagerUtil {
     object Once : CycleFlag()
     object Daily : CycleFlag()
     object Weekly : CycleFlag()
-    sealed class NoticeFlag:Serializable
-    object OnlySound : NoticeFlag()
-    object OnlyVibrator : NoticeFlag()
-    object BothSoundAndVibrator : NoticeFlag()
-
-
+    
+    const val OnlySound: NoticeFlag= 0
+    const val OnlyVibrator: NoticeFlag = 1
+    const val BothSoundAndVibrator: NoticeFlag = 2
+    const val NormMode: Mode = 0
+    const val MathMode: Mode = 1
+    const val JigsawMode: Mode = 2
+    const val ScanMode: Mode = 3
     /**
      * @param cycleFlag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复
      * @param hour 时
@@ -66,7 +68,7 @@ object AlarmManagerUtil {
         noticeFlag: NoticeFlag,
         week: Int,
         mode: Mode
-    ) :Intent{
+    ){
         val am: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val calendar:Calendar  = Calendar.getInstance()
         var intervalMillis: Long = 0
@@ -85,14 +87,13 @@ object AlarmManagerUtil {
         intent.putExtra(MODE, mode)
         intent.setPackage(context.packageName)
         val sender = PendingIntent.getBroadcast(context, id,
-            intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            intent, PendingIntent.FLAG_CANCEL_CURRENT)
         am.setWindow(
             AlarmManager.RTC_WAKEUP,
             calMethod(week, calendar.timeInMillis),
             10,
             sender)
         Log.e("setAlarm", "闹钟已经设置")
-        return intent
     }
 
     /**
@@ -143,3 +144,6 @@ object AlarmManagerUtil {
         return time
     }
 }
+
+typealias NoticeFlag = Int
+typealias Mode = Int
