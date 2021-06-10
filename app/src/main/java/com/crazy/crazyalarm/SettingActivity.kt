@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.crazy.crazyalarm.clockUtils.AlarmManagerUtil
+import com.crazy.crazyalarm.clockUtils.Configuration
 import com.crazy.crazyalarm.databinding.ActivitySettingBinding
 import com.huawei.hms.hmsscankit.ScanUtil
 import com.huawei.hms.ml.scan.HmsScan
@@ -47,21 +48,21 @@ class SettingActivity : AppCompatActivity() {
                     11 -> 14
                     else -> 0
                 }
-                AlarmManagerUtil.Math.modeCode = modeCode
+                Configuration.MathConf.modeCode = modeCode
                 val editor = getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
                 editor.putInt(MATH_CODE, modeCode)
                 editor.apply()
 
-                val prefs =  getSharedPreferences(SETTING, MODE_PRIVATE)
-                val code = prefs.getInt(MATH_CODE,123)
-                    Toast.makeText(this@SettingActivity,code.toString(),Toast.LENGTH_SHORT).show()
+//                val prefs =  getSharedPreferences(SETTING, MODE_PRIVATE)
+//                val code = prefs.getInt(MATH_CODE,123)
+//                    Toast.makeText(this@SettingActivity,code.toString(),Toast.LENGTH_SHORT).show()
 
 
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 val modeCode = 0
-                AlarmManagerUtil.Math.modeCode = modeCode
+                Configuration.MathConf.modeCode = modeCode
                 val editor = getSharedPreferences(SETTING, Context.MODE_PRIVATE).edit()
                 editor.putInt(MATH_CODE, modeCode)
                 editor.apply()
@@ -79,13 +80,14 @@ class SettingActivity : AppCompatActivity() {
             val obj: HmsScan? = data.getParcelableExtra(ScanUtil.RESULT)
             obj?.let{
                 Toast.makeText(this, "设置二维码成功！", Toast.LENGTH_SHORT).show()
+                Configuration.ScanConf.scanString = it.originalValue
                 getSharedPreferences(SETTING, MODE_PRIVATE).edit().run {
                     putString(SCAN_STRING, it.originalValue)
                     apply()
                 }
-                getSharedPreferences(SETTING, MODE_PRIVATE).run {
-                    Toast.makeText(this@SettingActivity,getString(SCAN_STRING,""),Toast.LENGTH_SHORT).show()
-                }
+//                getSharedPreferences(SETTING, MODE_PRIVATE).run {
+//                    Toast.makeText(this@SettingActivity,getString(SCAN_STRING,""),Toast.LENGTH_SHORT).show()
+//                }
             }
 
 

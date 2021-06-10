@@ -41,7 +41,7 @@ object AlarmManagerUtil {
     object Once : CycleFlag()
     object Daily : CycleFlag()
     object Weekly : CycleFlag()
-
+    
     const val OnlySound: NoticeFlag= 0
     const val OnlyVibrator: NoticeFlag = 1
     const val BothSoundAndVibrator: NoticeFlag = 2
