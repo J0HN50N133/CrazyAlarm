@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="mathMode">
+        <item >一元一次方程</item>
+        <item >对数式</item>
+        <item >加法</item>
+        <item >减法</item>
+        <item >乘法</item>
+        <item >除法</item>
+        <item >开方</item>
+        <item >平方</item>
+        <item >阶乘</item>
+        <item >求余</item>
+        <item >二进制转十进制</item>
+        <item >十进制转二进制</item>
+    </string-array>
+</resources>
