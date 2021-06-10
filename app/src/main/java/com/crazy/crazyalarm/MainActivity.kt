@@ -1,6 +1,7 @@
 package com.crazy.crazyalarm
 
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -204,5 +205,10 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
                 setClock()
             }
         }
+    }
+    //用来测试别的activity
+    fun jumpToTest(view: View?){
+        val intent = Intent(this,SettingActivity::class.java)
+        startActivity(intent)
     }
 }

@@ -48,7 +48,7 @@ object AlarmManagerUtil {
 
     }
     object Math : Mode() {
-
+        var modeCode = 0
     }
     object Jigsaw : Mode() {
 
