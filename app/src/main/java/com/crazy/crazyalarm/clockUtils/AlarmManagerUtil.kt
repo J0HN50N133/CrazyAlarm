@@ -45,19 +45,7 @@ object AlarmManagerUtil {
     object OnlySound : NoticeFlag()
     object OnlyVibrator : NoticeFlag()
     object BothSoundAndVibrator : NoticeFlag()
-    sealed class Mode:Serializable
-    object Norm : Mode() {
 
-    }
-    object Math : Mode() {
-        var modeCode = 0
-    }
-    object Jigsaw : Mode() {
-
-    }
-    object Scan : Mode() {
-
-    }
 
     /**
      * @param cycleFlag 周期性表示，Once表示一次性闹钟， Daily表示每天重复， Weekly表示每周重复
