@@ -1,29 +1,23 @@
-package com.crazy.crazyalarm.closeModeActivity.jigsaw.game;
+package com.crazy.crazyalarm.closeModeActivity.jigsaw.game
 
-
-
-public interface Game {
-
+interface Game {
     /**
      * 增加难度
      */
-    public void addLevel();
+    fun addLevel()
 
     /**
      * 减少难度
      */
-    public void reduceLevel();
-
-//    /**
-//     * 修改游戏模式
-//     */
-//    public void changeMode(String gameMode);
-
+    fun reduceLevel()
+    //    /**
+    //     * 修改游戏模式
+    //     */
+    //    public void changeMode(String gameMode);
     /**
      * 修改图片
      *
      * @param res
      */
-    public void changeImage(int res);
-
+    fun changeImage(res: Int)
 }

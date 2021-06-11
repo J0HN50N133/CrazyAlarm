@@ -1,22 +1,17 @@
-package com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils;
+package com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.WindowManager;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.DisplayMetrics
+import android.util.TypedValue
+import android.view.WindowManager
+import com.crazy.crazyalarm.R
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImagePiece
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.ui.PuzzleLayout
+import java.util.*
 
-import com.crazy.crazyalarm.R;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImagePiece;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.ui.PuzzleLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
-public class Utils {
-
+object Utils {
     /**
      * 返回屏幕的宽高，用数组返回
      * 下标0，width。 下标1，height。
@@ -24,17 +19,18 @@ public class Utils {
      * @param context
      * @return
      */
-    public static int[] getScreenWidth(Context context) {
-        context = context.getApplicationContext();
-        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        manager.getDefaultDisplay().getMetrics(outMetrics);
-        int width = outMetrics.widthPixels;
-        int height = outMetrics.heightPixels;
-        int[] size = new int[2];
-        size[0] = width;
-        size[1] = height;
-        return size;
+    fun getScreenWidth(context: Context): IntArray {
+        var context = context
+        context = context.applicationContext
+        val manager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val outMetrics = DisplayMetrics()
+        manager.defaultDisplay.getMetrics(outMetrics)
+        val width = outMetrics.widthPixels
+        val height = outMetrics.heightPixels
+        val size = IntArray(2)
+        size[0] = width
+        size[1] = height
+        return size
     }
 
     /**
@@ -44,72 +40,83 @@ public class Utils {
      * @param count
      * @return
      */
-    public static List<ImagePiece> splitImage(Context context, Bitmap bitmap, int count, String gameMode) {
-
-        List<ImagePiece> imagePieces = new ArrayList<>();
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        int picWidth = Math.min(width, height) / count;
-
-        for (int i = 0; i < count; i++) {
-            for (int j = 0; j < count; j++) {
-                ImagePiece imagePiece = new ImagePiece();
-                imagePiece.setIndex(j + i * count);
+    fun splitImage(
+        context: Context,
+        bitmap: Bitmap,
+        count: Int,
+        gameMode: String
+    ): MutableList<ImagePiece> {
+        val imagePieces: MutableList<ImagePiece> = ArrayList()
+        val width = bitmap.width
+        val height = bitmap.height
+        val picWidth = Math.min(width, height) / count
+        for (i in 0 until count) {
+            for (j in 0 until count) {
+                val imagePiece = ImagePiece()
+                imagePiece.index = j + i * count
                 //为createBitmap 切割图片获取xy
-                int x = j * picWidth;
-                int y = i * picWidth;
-                if (gameMode.equals(PuzzleLayout.GAME_MODE_NORMAL)) {
+                val x = j * picWidth
+                val y = i * picWidth
+                if (gameMode == PuzzleLayout.GAME_MODE_NORMAL) {
                     if (i == count - 1 && j == count - 1) {
-                        imagePiece.setType(ImagePiece.TYPE_EMPTY);
-                        Bitmap emptyBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.empty);
-                        imagePiece.setBitmap(emptyBitmap);
+                        imagePiece.type = ImagePiece.TYPE_EMPTY
+                        val emptyBitmap =
+                            BitmapFactory.decodeResource(context.resources, R.drawable.empty)
+                        imagePiece.bitmap = emptyBitmap
                     } else {
-                        imagePiece.setBitmap(Bitmap.createBitmap(bitmap, x, y, picWidth, picWidth));
+                        imagePiece.bitmap = Bitmap.createBitmap(bitmap, x, y, picWidth, picWidth)
                     }
                 } else {
-                    imagePiece.setBitmap(Bitmap.createBitmap(bitmap, x, y, picWidth, picWidth));
+                    imagePiece.bitmap = Bitmap.createBitmap(bitmap, x, y, picWidth, picWidth)
                 }
-                imagePieces.add(imagePiece);
+                imagePieces.add(imagePiece)
             }
         }
-        return imagePieces;
+        return imagePieces
     }
 
     /**
      * 读取图片，按照缩放比保持长宽比例返回bitmap对象
-     * <p>
+     *
+     *
      *
      * @param scale 缩放比例(1到10, 为2时，长和宽均缩放至原来的2分之1，为3时缩放至3分之1，以此类推)
      * @return Bitmap
      */
-    public synchronized static Bitmap readBitmap(Context context, int res, int scale) {
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            options.inSampleSize = scale;
-            options.inPurgeable = true;
-            options.inInputShareable = true;
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-            return BitmapFactory.decodeResource(context.getResources(), res, options);
-        } catch (Exception e) {
-            return null;
+    @JvmStatic
+    @Synchronized
+    fun readBitmap(context: Context, res: Int, scale: Int): Bitmap? {
+        return try {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = false
+            options.inSampleSize = scale
+            options.inPurgeable = true
+            options.inInputShareable = true
+            options.inPreferredConfig = Bitmap.Config.RGB_565
+            BitmapFactory.decodeResource(context.resources, res, options)
+        } catch (e: Exception) {
+            null
         }
     }
 
-    public static int getMinLength(int... params) {
-        int min = params[0];
-        for (int para : params) {
+    fun getMinLength(vararg params: Int): Int {
+        var min = params[0]
+        for (para in params) {
             if (para < min) {
-                min = para;
+                min = para
             }
         }
-        return min;
+        return min
     }
 
     //dp px
-    public static int dp2px(Context context, int dpval) {
-        context = context.getApplicationContext();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpval, context.getResources().getDisplayMetrics());
+    fun dp2px(context: Context, dpval: Int): Int {
+        var context = context
+        context = context.applicationContext
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dpval.toFloat(),
+            context.resources.displayMetrics
+        ).toInt()
     }
 }

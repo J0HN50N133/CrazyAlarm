@@ -1,107 +1,97 @@
-package com.crazy.crazyalarm.closeModeActivity.jigsaw.dialog;
+package com.crazy.crazyalarm.closeModeActivity.jigsaw.dialog
 
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-//import android.support.v7.widget.GridLayoutManager;
-//import androidx.gridlayout.widget.GridLayout;
-//import android.support.v7.widget.RecyclerView;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ImageView;
-
-import com.crazy.crazyalarm.R;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils.Utils;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImageSoures;
+import androidx.recyclerview.widget.RecyclerView
+import android.app.Activity
+import android.app.DialogFragment
+import android.app.FragmentManager
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.os.Bundle
+import com.crazy.crazyalarm.R
+import androidx.recyclerview.widget.GridLayoutManager
+import android.view.View
+import android.view.Window
+import android.widget.ImageView
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils.Utils
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImageSoures
 
 
-
-public class SelectImageDialog extends DialogFragment {
-
-    private View view;
-    private RecyclerView imageList;
-    private OnItemClickListener itemClickListener;
-    private Activity activity;
-    private int selectRes;
-    private ImageListAdapter imageListAdapter;
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        view = inflater.inflate(R.layout.dialog_select_image, container);
-        imageList = (RecyclerView) view.findViewById(R.id.list);
-        return view;
+class SelectImageDialog : DialogFragment() {
+    private lateinit  var view1: View
+    private var imageList: RecyclerView? = null
+    private var itemClickListener: OnItemClickListener? = null
+    private lateinit var activity1: Activity
+    private var selectRes = 0
+    private var imageListAdapter: ImageListAdapter? = null
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle
+    ): View? {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        view1 = inflater.inflate(R.layout.dialog_select_image, container)
+        imageList = view1.findViewById<View>(R.id.list) as RecyclerView
+        return view1
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        activity = getActivity();
-        imageList.setLayoutManager(new GridLayoutManager(getActivity().getApplicationContext(), 2));
-        imageListAdapter = new ImageListAdapter();
-        imageList.setAdapter(imageListAdapter);
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        activity1 = getActivity()
+        imageList!!.layoutManager = GridLayoutManager(getActivity().applicationContext, 2)
+        imageListAdapter = ImageListAdapter()
+        imageList!!.adapter = imageListAdapter
     }
 
-    public class ImageListAdapter extends RecyclerView.Adapter {
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ImageViewHolder(LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.item_list, parent, false));
+    inner class ImageListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            return ImageViewHolder(
+                LayoutInflater.from(activity1!!.applicationContext)
+                    .inflate(R.layout.item_list, parent, false)
+            )
         }
 
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            ImageViewHolder viewHolder = (ImageViewHolder) holder;
-            Bitmap bitmap = Utils.readBitmap(activity.getApplicationContext(), ImageSoures.imageSours[position], 3);
-            viewHolder.imageView.setImageBitmap(bitmap);
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val viewHolder = holder as ImageViewHolder?
+            val bitmap = Utils.readBitmap(
+                activity1!!.applicationContext, ImageSoures.imageSours[position], 3
+            )
+            viewHolder!!.imageView.setImageBitmap(bitmap)
         }
 
-        @Override
-        public int getItemCount() {
-            return ImageSoures.imageSours.length;
+        override fun getItemCount(): Int {
+            return ImageSoures.imageSours.size
         }
+
+
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder {
+    inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var imageView: ImageView
 
-        public ImageView imageView;
-
-        public ImageViewHolder(View itemView) {
-            super(itemView);
-            imageView = (ImageView) itemView.findViewById(R.id.itemImg);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (getAdapterPosition() != -1 && itemClickListener != null) {
-                        itemClickListener.itemClick(getAdapterPosition(), ImageSoures.imageSours[getAdapterPosition()]);
-                        dismiss();
-                    }
+        init {
+            imageView = itemView.findViewById<View>(R.id.itemImg) as ImageView
+            imageView.setOnClickListener {
+                if (adapterPosition != -1 && itemClickListener != null) {
+                    itemClickListener!!.itemClick(
+                        adapterPosition,
+                        ImageSoures.imageSours[adapterPosition]
+                    )
+                    dismiss()
                 }
-            });
+            }
         }
     }
 
-
-    public void showDialog(FragmentManager fragmentManager, String tag, int res) {
-        show(fragmentManager, "tag");
-        selectRes = res;
+    fun showDialog(fragmentManager: FragmentManager?, tag: String?, res: Int) {
+        show(fragmentManager, "tag")
+        selectRes = res
     }
 
-    public void addItemClickListener(OnItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
+    fun addItemClickListener(itemClickListener: OnItemClickListener?) {
+        this.itemClickListener = itemClickListener
     }
 
-    public interface OnItemClickListener {
-        public void itemClick(int postion, int res);
+    interface OnItemClickListener {
+        fun itemClick(postion: Int, res: Int)
     }
-
-
 }

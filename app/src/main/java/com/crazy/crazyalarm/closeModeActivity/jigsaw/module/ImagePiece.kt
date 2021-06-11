@@ -1,52 +1,19 @@
-package com.crazy.crazyalarm.closeModeActivity.jigsaw.module;
+package com.crazy.crazyalarm.closeModeActivity.jigsaw.module
 
-import android.graphics.Bitmap;
-import android.widget.ImageView;
+import android.graphics.Bitmap
+import android.widget.ImageView
 
-public class ImagePiece {
-
-    public static final int TYPE_NORMAL = 0;
-    public static final int TYPE_EMPTY = 1;
-
-    private int type = TYPE_NORMAL;
-    private int index;
-    private Bitmap bitmap;
-    private ImageView imageView;
-
-    public ImageView getImageView() {
-        return imageView;
+class ImagePiece {
+    var type = TYPE_NORMAL
+    var index = 0
+    var bitmap: Bitmap? = null
+    var imageView: ImageView? = null
+    override fun toString(): String {
+        return super.toString()
     }
 
-    public void setImageView(ImageView imageView) {
-        this.imageView = imageView;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
+    companion object {
+        const val TYPE_NORMAL = 0
+        const val TYPE_EMPTY = 1
     }
 }

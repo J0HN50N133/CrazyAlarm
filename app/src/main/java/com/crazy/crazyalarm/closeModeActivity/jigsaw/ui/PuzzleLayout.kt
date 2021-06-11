@@ -1,113 +1,90 @@
-package com.crazy.crazyalarm.closeModeActivity.jigsaw.ui;
+package com.crazy.crazyalarm.closeModeActivity.jigsaw.ui
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.util.AttributeSet
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.Toast
+import com.crazy.crazyalarm.R
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils.Utils
+import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImagePiece
+import java.util.*
+
 //import android.support.annotation.NonNull;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
-import com.crazy.crazyalarm.R;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils.Utils;
-import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImagePiece;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-
-public class PuzzleLayout extends FrameLayout implements View.OnClickListener {
-
-    public static final String GAME_MODE_NORMAL = "gameModeNormal";
-    public static final String GAME_MODE_EXCHANGE = "gameModeExchange";
-
-    private static final int DEFAULT_MARGIN = 3;
-
+class PuzzleLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr), View.OnClickListener {
     //游戏模式
-    private String mGameMode = GAME_MODE_EXCHANGE;
+    private val mGameMode = GAME_MODE_EXCHANGE
 
     //拼图布局为正方形，宽度为屏幕的宽度
-    private int mViewWidth = 0;
+    private var mViewWidth = 0
 
     //拼图游戏每一行的图片个数(默认为三个)
-    private int mCount = 3;
+    var count = 3
+        private set
 
     //每张图片的宽度
-    private int mItemWidth;
+    private var mItemWidth = 0
 
     //拼图游戏bitmap集合
-    private List<ImagePiece> mImagePieces;
+    private lateinit var mImagePieces: MutableList<ImagePiece>
 
     //用于给每个图片设置大小
-    private LayoutParams layoutParams;
+    private var layoutParams: LayoutParams? = null
 
     //大图
-    private Bitmap mBitmap;
+    lateinit var bitmap: Bitmap
+        private set
 
     //动画层
-    private RelativeLayout mAnimLayout;
+    private var mAnimLayout: RelativeLayout? = null
 
     //小图之间的margin
-    private int mMargin;
+    private var mMargin = 0
 
     //这个view的padding
-    private int mPadding;
+    private var mPadding = 0
 
     //选中的第一张图片
-    private ImageView mFirst;
+    private var mFirst: ImageView? = null
 
     //选中的第二张图片
-    private ImageView mSecond;
+    private var mSecond: ImageView? = null
 
     //是否添加了动画层
-    private boolean isAddAnimatorLayout = false;
+    private var isAddAnimatorLayout = false
 
     //是否正在进行动画
-    private boolean isAnimation = false;
+    private var isAnimation = false
+    var res = R.mipmap.sdhy
+        private set
 
-    private int res = R.mipmap.sdhy;
-
-    public PuzzleLayout(Context context) {
-        this(context, null);
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        setMeasuredDimension(mViewWidth, mViewWidth)
     }
 
-    public PuzzleLayout(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public PuzzleLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-        initBitmaps();
-        initBitmapsWidth();
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(mViewWidth, mViewWidth);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        for (int i = 0; i < getChildCount(); i++) {
-            if (getChildAt(i) instanceof ImageView) {
-                ImageView imageView = (ImageView) getChildAt(i);
-                imageView.layout(imageView.getLeft(), imageView.getTop(), imageView.getRight(), imageView.getBottom());
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        for (i in 0 until childCount) {
+            if (getChildAt(i) is ImageView) {
+                val imageView = getChildAt(i) as ImageView
+                imageView.layout(imageView.left, imageView.top, imageView.right, imageView.bottom)
             } else {
-                RelativeLayout relativeLayout = (RelativeLayout) getChildAt(i);
-                relativeLayout.layout(0, 0, mViewWidth, mViewWidth);
+                val relativeLayout = getChildAt(i) as RelativeLayout
+                relativeLayout.layout(0, 0, mViewWidth, mViewWidth)
             }
         }
     }
@@ -117,53 +94,50 @@ public class PuzzleLayout extends FrameLayout implements View.OnClickListener {
      *
      * @param context
      */
-    private void init(Context context) {
-        mMargin = Utils.dp2px(context, DEFAULT_MARGIN);
-        mViewWidth = Utils.getScreenWidth(context)[0];
-        mPadding = Utils.getMinLength(getPaddingBottom(), getPaddingLeft(), getPaddingRight(), getPaddingTop());
-        mItemWidth = (mViewWidth - mPadding * 2 - mMargin * (mCount - 1)) / mCount;
+    private fun init(context: Context) {
+        mMargin = Utils.dp2px(context, DEFAULT_MARGIN)
+        mViewWidth = Utils.getScreenWidth(context)[0]
+        mPadding = Utils.getMinLength(
+            paddingBottom, paddingLeft, paddingRight, paddingTop
+        )
+        mItemWidth = (mViewWidth - mPadding * 2 - mMargin * (count - 1)) / count
     }
 
     /**
      * 将大图切割成多个小图
      */
-    private void initBitmaps() {
-        if (mBitmap == null) {
-            mBitmap = BitmapFactory.decodeResource(getResources(), res);
+    private fun initBitmaps() {
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(resources, res)
         }
-        mImagePieces = Utils.splitImage(getContext(), mBitmap, mCount, mGameMode);
-        sortImagePieces();
+        mImagePieces = Utils.splitImage(context, bitmap, count, mGameMode)
+        sortImagePieces()
     }
 
     /**
      * 对ImagePieces进行排序
      */
-    private void sortImagePieces() {
+    private fun sortImagePieces() {
         try {
-            Collections.sort(mImagePieces, new Comparator<ImagePiece>() {
-                @Override
-                public int compare(ImagePiece lhs, ImagePiece rhs) {
-                    return Math.random() > 0.5 ? 1 : -1;
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+            Collections.sort(mImagePieces) { lhs, rhs -> if (Math.random() > 0.5) 1 else -1 }
+        } catch (e: Exception) {
+            e.printStackTrace()
         } finally {
-            if (mGameMode.equals(GAME_MODE_NORMAL)) {
+            if (mGameMode == GAME_MODE_NORMAL) {
                 //如果是第二种模式就将空图放在最后
-                ImagePiece tempImagePieces = null;
-                int tempIndex = 0;
-                for (int i = 0; i < mImagePieces.size(); i++) {
-                    ImagePiece imagePiece = mImagePieces.get(i);
-                    if (imagePiece.getType() == ImagePiece.TYPE_EMPTY) {
-                        tempImagePieces = imagePiece;
-                        tempIndex = i;
-                        break;
+                var tempImagePieces: ImagePiece? = null
+                var tempIndex = 0
+                for (i in mImagePieces!!.indices) {
+                    val imagePiece = mImagePieces!![i]
+                    if (imagePiece.type == ImagePiece.TYPE_EMPTY) {
+                        tempImagePieces = imagePiece
+                        tempIndex = i
+                        break
                     }
                 }
-                if (tempImagePieces == null) return;
-                mImagePieces.remove(tempIndex);
-                mImagePieces.add(mImagePieces.size(), tempImagePieces);
+                if (tempImagePieces == null) return
+                mImagePieces!!.removeAt(tempIndex)
+                mImagePieces!!.add(mImagePieces!!.size, tempImagePieces)
             }
         }
     }
@@ -171,178 +145,171 @@ public class PuzzleLayout extends FrameLayout implements View.OnClickListener {
     /**
      * 设置图片的大小和layout的属性
      */
-    private void initBitmapsWidth() {
-        int line = 0;
-        int left = 0;
-        int top = 0;
-        int right = 0;
-        int bottom = 0;
-        for (int i = 0; i < mImagePieces.size(); i++) {
-            ImageView imageView = new ImageView(getContext());
-            imageView.setImageBitmap(mImagePieces.get(i).getBitmap());
-            layoutParams = new LayoutParams(mItemWidth, mItemWidth);
-            imageView.setLayoutParams(layoutParams);
-            if (i != 0 && i % mCount == 0) {
-                line++;
+    private fun initBitmapsWidth() {
+        var line = 0
+        var left = 0
+        var top = 0
+        var right = 0
+        var bottom = 0
+        for (i in mImagePieces!!.indices) {
+            val imageView = ImageView(context)
+            imageView.setImageBitmap(mImagePieces!![i].bitmap)
+            layoutParams = LayoutParams(mItemWidth, mItemWidth)
+            imageView.layoutParams = layoutParams
+            if (i != 0 && i % count == 0) {
+                line++
             }
-            if (i % mCount == 0) {
-                left = i % mCount * mItemWidth;
+            left = if (i % count == 0) {
+                i % count * mItemWidth
             } else {
-                left = i % mCount * mItemWidth + (i % mCount) * mMargin;
+                i % count * mItemWidth + i % count * mMargin
             }
-            top = mItemWidth * line + line * mMargin;
-            right = left + mItemWidth;
-            bottom = top + mItemWidth;
-            imageView.setRight(right);
-            imageView.setLeft(left);
-            imageView.setBottom(bottom);
-            imageView.setTop(top);
-            imageView.setId(i);
-            imageView.setOnClickListener(this);
-            mImagePieces.get(i).setImageView(imageView);
-            addView(imageView);
+            top = mItemWidth * line + line * mMargin
+            right = left + mItemWidth
+            bottom = top + mItemWidth
+            imageView.right = right
+            imageView.left = left
+            imageView.bottom = bottom
+            imageView.top = top
+            imageView.id = i
+            imageView.setOnClickListener(this)
+            mImagePieces!![i].imageView = imageView
+            addView(imageView)
         }
     }
-//
-//    public void changeMode(@NonNull String gameMode) {
-//        if (gameMode.equals(mGameMode)) {
-//            return;
-//        }
-//        this.mGameMode = gameMode;
-//        reset();
-//    }
 
-    public void reset() {
-        mItemWidth = (mViewWidth - mPadding * 2 - mMargin * (mCount - 1)) / mCount;
+    //
+    //    public void changeMode(@NonNull String gameMode) {
+    //        if (gameMode.equals(mGameMode)) {
+    //            return;
+    //        }
+    //        this.mGameMode = gameMode;
+    //        reset();
+    //    }
+    fun reset() {
+        mItemWidth = (mViewWidth - mPadding * 2 - mMargin * (count - 1)) / count
         if (mImagePieces != null) {
-            mImagePieces.clear();
+            mImagePieces!!.clear()
         }
-        isAddAnimatorLayout = false;
-        mBitmap = null;
-        removeAllViews();
-        initBitmaps();
-        initBitmapsWidth();
+        isAddAnimatorLayout = false
+//        bitmap = null
+        removeAllViews()
+        initBitmaps()
+        initBitmapsWidth()
     }
 
     /**
      * 添加count 最多每行7个
      */
-    public boolean addCount() {
-        mCount++;
-        if (mCount > 7) {
-            mCount--;
-            return false;
+    fun addCount(): Boolean {
+        count++
+        if (count > 7) {
+            count--
+            return false
         }
-        reset();
-        return true;
+        reset()
+        return true
     }
 
     /**
      * 改变图片
      */
-    public void changeRes(int res) {
-        this.res = res;
-        reset();
+    fun changeRes(res: Int) {
+        this.res = res
+        reset()
     }
 
     /**
      * 减少count 最少每行三个，否则普通模式无法游戏
      */
-    public boolean reduceCount() {
-        mCount--;
-        if (mCount < 3) {
-            mCount++;
-            return false;
+    fun reduceCount(): Boolean {
+        count--
+        if (count < 3) {
+            count++
+            return false
         }
-        reset();
-        return true;
+        reset()
+        return true
     }
 
-    @Override
-    public void onClick(View v) {
+    override fun onClick(v: View) {
         if (isAnimation) {
             //还在运行动画的时候，不允许点击
-            return;
+            return
         }
-        if (!(v instanceof ImageView)) {
-            return;
+        if (v !is ImageView) {
+            return
         }
-        if (GAME_MODE_NORMAL.equals(mGameMode)) {
-            ImageView imageView = (ImageView) v;
-            ImagePiece imagePiece = mImagePieces.get(imageView.getId());
-            if (imagePiece.getType() == ImagePiece.TYPE_EMPTY) {
+        if (GAME_MODE_NORMAL == mGameMode) {
+            val imagePiece = mImagePieces!![v.id]
+            if (imagePiece.type == ImagePiece.TYPE_EMPTY) {
                 //普通模式，点击到空图不做处理
-                return;
+                return
             }
             if (mFirst == null) {
-                mFirst = (ImageView) v;
+                mFirst = v
             }
-            checkEmptyImage(mFirst);
+            checkEmptyImage(mFirst)
         } else {
             //点的是同一个View
-            if (mFirst == v) {
-                mFirst.setColorFilter(null);
-                mFirst = null;
-                return;
+            if (mFirst === v) {
+                mFirst!!.setColorFilter(Color.parseColor("#FF4081"), PorterDuff.Mode.LIGHTEN)
+                mFirst = null
+                return
             }
             if (mFirst == null) {
-                mFirst = (ImageView) v;
+                mFirst = v
                 //选中之后添加一层颜色
-                mFirst.setColorFilter(Color.parseColor("#4169E100"));
-//                mFirst.setColorFilter(Color.parseColor("#55FF0000"));
+                mFirst!!.setColorFilter(Color.parseColor("#4169E100"))
+                //                mFirst.setColorFilter(Color.parseColor("#55FF0000"));
             } else {
-                mSecond = (ImageView) v;
-                exChangeView();
+                mSecond = v
+                exChangeView()
             }
         }
     }
 
-    private void checkEmptyImage(ImageView imageView) {
-        int index = imageView.getId();
-        int line = mImagePieces.size() / mCount;
-        ImagePiece imagePiece = null;
-        if (index < mCount) {
+    private fun checkEmptyImage(imageView: ImageView?) {
+        val index = imageView!!.id
+        val line = mImagePieces!!.size / count
+        var imagePiece: ImagePiece? = null
+        if (index < count) {
             //第一行（需要额外计算，下一行是否有空图）
-            imagePiece = checkCurrentLine(index);
+            imagePiece = checkCurrentLine(index)
             //判断下一行同一列的图片是否为空
-            imagePiece = checkOtherline(index + mCount, imagePiece);
-        } else if (index < (line - 1) * mCount) {
+            imagePiece = checkOtherline(index + count, imagePiece)
+        } else if (index < (line - 1) * count) {
             //中间的行（需要额外计算，上一行和下一行是否有空图）
-            imagePiece = checkCurrentLine(index);
+            imagePiece = checkCurrentLine(index)
             //判断上一行同一列的图片是否为空
-            imagePiece = checkOtherline(index - mCount, imagePiece);
+            imagePiece = checkOtherline(index - count, imagePiece)
             //判断下一行同一列的图片是否为空
-            imagePiece = checkOtherline(index + mCount, imagePiece);
+            imagePiece = checkOtherline(index + count, imagePiece)
         } else {
             //最后一行（需要额外计算，上一行是否有空图））
-            imagePiece = checkCurrentLine(index);
+            imagePiece = checkCurrentLine(index)
             //检查上一行同一列有没有空图
-            imagePiece = checkOtherline(index - mCount, imagePiece);
+            imagePiece = checkOtherline(index - count, imagePiece)
         }
         if (imagePiece == null) {
             //周围没有空的imageView
-            mFirst = null;
-            mSecond = null;
+            mFirst = null
+            mSecond = null
         } else {
             //记录下第二张ImageView
-            mSecond = imagePiece.getImageView();
+            mSecond = imagePiece.imageView
             //选中第二个图片，开启动两张图片替换的动画
-            exChangeView();
+            exChangeView()
         }
     }
-
 
     /**
      * 检查上其他行同一列有没有空图
      *
      * @return
      */
-    private ImagePiece checkOtherline(int index, ImagePiece imagePiece) {
-        if (imagePiece != null) {
-            return imagePiece;
-        } else {
-            return getCheckEmptyImageView(index);
-        }
+    private fun checkOtherline(index: Int, imagePiece: ImagePiece?): ImagePiece? {
+        return imagePiece ?: getCheckEmptyImageView(index)
     }
 
     /**
@@ -351,172 +318,184 @@ public class PuzzleLayout extends FrameLayout implements View.OnClickListener {
      * @param index
      * @return
      */
-    private ImagePiece checkCurrentLine(int index) {
-        ImagePiece imagePiece = null;
+    private fun checkCurrentLine(index: Int): ImagePiece? {
+        var imagePiece: ImagePiece? = null
         //第一行
-        if (index % mCount == 0) {
+        if (index % count == 0) {
             //第一个
-            imagePiece = getCheckEmptyImageView(index + 1);
-        } else if (index % mCount == mCount - 1) {
+            imagePiece = getCheckEmptyImageView(index + 1)
+        } else if (index % count == count - 1) {
             //最后一个
-            imagePiece = getCheckEmptyImageView(index - 1);
+            imagePiece = getCheckEmptyImageView(index - 1)
         } else {
-            imagePiece = getCheckEmptyImageView(index + 1);
+            imagePiece = getCheckEmptyImageView(index + 1)
             if (imagePiece == null) {
-                imagePiece = getCheckEmptyImageView(index - 1);
+                imagePiece = getCheckEmptyImageView(index - 1)
             }
         }
-        return imagePiece;
+        return imagePiece
     }
 
-    private ImagePiece getCheckEmptyImageView(int index) {
-        ImagePiece imagePiece = mImagePieces.get(index);
-        if (imagePiece.getType() == ImagePiece.TYPE_EMPTY) {
+    private fun getCheckEmptyImageView(index: Int): ImagePiece? {
+        val imagePiece = mImagePieces!![index]
+        return if (imagePiece.type == ImagePiece.TYPE_EMPTY) {
             //找到空的imageView
-            return imagePiece;
-        }
-        return null;
+            imagePiece
+        } else null
     }
 
-    private ImageView addAnimationImageView(ImageView imageView) {
-        ImageView getImage = new ImageView(getContext());
-        RelativeLayout.LayoutParams firstParams = new RelativeLayout.LayoutParams(mItemWidth, mItemWidth);
-        firstParams.leftMargin = imageView.getLeft() - mPadding;
-        firstParams.topMargin = imageView.getTop() - mPadding;
-        Bitmap firstBitmap = mImagePieces.get(imageView.getId()).getBitmap();
-        getImage.setImageBitmap(firstBitmap);
-        getImage.setLayoutParams(firstParams);
-        mAnimLayout.addView(getImage);
-        return getImage;
+    private fun addAnimationImageView(imageView: ImageView?): ImageView {
+        val getImage = ImageView(context)
+        val firstParams = RelativeLayout.LayoutParams(mItemWidth, mItemWidth)
+        firstParams.leftMargin = imageView!!.left - mPadding
+        firstParams.topMargin = imageView.top - mPadding
+        val firstBitmap = mImagePieces!![imageView.id].bitmap
+        getImage.setImageBitmap(firstBitmap)
+        getImage.layoutParams = firstParams
+        mAnimLayout!!.addView(getImage)
+        return getImage
     }
 
     /**
      * 添加动画层，并且添加平移的动画
      */
-    private void exChangeView() {
+    private fun exChangeView() {
 
         //添加动画层
-        setUpAnimLayout();
+        setUpAnimLayout()
         //添加第一个图片
-        ImageView first = addAnimationImageView(mFirst);
+        val first = addAnimationImageView(mFirst)
         //添加另一个图片
-        ImageView second = addAnimationImageView(mSecond);
-
-        ObjectAnimator secondXAnimator = ObjectAnimator.ofFloat(second, "TranslationX", 0f, -(mSecond.getLeft() - mFirst.getLeft()));
-        ObjectAnimator secondYAnimator = ObjectAnimator.ofFloat(second, "TranslationY", 0f, -(mSecond.getTop() - mFirst.getTop()));
-        ObjectAnimator firstXAnimator = ObjectAnimator.ofFloat(first, "TranslationX", 0f, mSecond.getLeft() - mFirst.getLeft());
-        ObjectAnimator firstYAnimator = ObjectAnimator.ofFloat(first, "TranslationY", 0f, mSecond.getTop() - mFirst.getTop());
-        AnimatorSet secondAnimator = new AnimatorSet();
-        secondAnimator.play(secondXAnimator).with(secondYAnimator).with(firstXAnimator).with(firstYAnimator);
-        secondAnimator.setDuration(300);
-
-        final ImagePiece firstPiece = mImagePieces.get(mFirst.getId());
-        final ImagePiece secondPiece = mImagePieces.get(mSecond.getId());
-        final int firstType = firstPiece.getType();
-        final int secondType = secondPiece.getType();
-        final Bitmap firstBitmap = mImagePieces.get(mFirst.getId()).getBitmap();
-        final Bitmap secondBitmap = mImagePieces.get(mSecond.getId()).getBitmap();
-//        final int firstIndex = mImagePieces.get(mFirst.getId()).getIndex();
+        val second = addAnimationImageView(mSecond)
+        val secondXAnimator = ObjectAnimator.ofFloat(
+            second,
+            "TranslationX",
+            0f,
+            -(mSecond!!.left - mFirst!!.left).toFloat()
+        )
+        val secondYAnimator = ObjectAnimator.ofFloat(
+            second,
+            "TranslationY",
+            0f,
+            -(mSecond!!.top - mFirst!!.top).toFloat()
+        )
+        val firstXAnimator = ObjectAnimator.ofFloat(
+            first,
+            "TranslationX",
+            0f,
+            (mSecond!!.left - mFirst!!.left).toFloat()
+        )
+        val firstYAnimator = ObjectAnimator.ofFloat(
+            first,
+            "TranslationY",
+            0f,
+            (mSecond!!.top - mFirst!!.top).toFloat()
+        )
+        val secondAnimator = AnimatorSet()
+        secondAnimator.play(secondXAnimator).with(secondYAnimator).with(firstXAnimator)
+            .with(firstYAnimator)
+        secondAnimator.duration = 300
+        val firstPiece = mImagePieces!![mFirst!!.id]
+        val secondPiece = mImagePieces!![mSecond!!.id]
+        val firstType = firstPiece.type
+        val secondType = secondPiece.type
+        val firstBitmap = mImagePieces!![mFirst!!.id].bitmap
+        val secondBitmap = mImagePieces!![mSecond!!.id].bitmap
+        //        final int firstIndex = mImagePieces.get(mFirst.getId()).getIndex();
 //        final int secondIndex = mImagePieces.get(mFirst.getId()).getIndex();
-        secondAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                int fristIndex = firstPiece.getIndex();
-                int secondeIndex = secondPiece.getIndex();
+        secondAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                val fristIndex = firstPiece.index
+                val secondeIndex = secondPiece.index
                 if (mFirst != null) {
-                    mFirst.setColorFilter(null);
-                    mFirst.setVisibility(VISIBLE);
-                    mFirst.setImageBitmap(secondBitmap);
-                    firstPiece.setBitmap(secondBitmap);
-                    firstPiece.setIndex(secondeIndex);
+                    mFirst!!.setColorFilter(Color.parseColor("#FF4081"),PorterDuff.Mode.LIGHTEN)
+                    mFirst!!.visibility = VISIBLE
+                    mFirst!!.setImageBitmap(secondBitmap)
+                    firstPiece.bitmap = secondBitmap
+                    firstPiece.index = secondeIndex
                 }
                 if (mSecond != null) {
-                    mSecond.setVisibility(VISIBLE);
-                    mSecond.setImageBitmap(firstBitmap);
-                    secondPiece.setBitmap(firstBitmap);
-                    secondPiece.setIndex(fristIndex);
+                    mSecond!!.visibility = VISIBLE
+                    mSecond!!.setImageBitmap(firstBitmap)
+                    secondPiece.bitmap = firstBitmap
+                    secondPiece.index = fristIndex
                 }
-                if (mGameMode.equals(GAME_MODE_NORMAL)) {
-                    firstPiece.setType(secondType);
-                    secondPiece.setType(firstType);
+                if (mGameMode == GAME_MODE_NORMAL) {
+                    firstPiece.type = secondType
+                    secondPiece.type = firstType
                 }
-
-                mAnimLayout.removeAllViews();
-                mAnimLayout.setVisibility(GONE);
-                mFirst = null;
-                mSecond = null;
-                isAnimation = false;
-                invalidate();
+                mAnimLayout!!.removeAllViews()
+                mAnimLayout!!.visibility = GONE
+                mFirst = null
+                mSecond = null
+                isAnimation = false
+                invalidate()
                 if (checkSuccess()) {
-
-                    Toast.makeText(getContext(), "成功!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "成功!", Toast.LENGTH_SHORT).show()
                     if (mSuccessListener != null) {
-                        mSuccessListener.success();
+                        mSuccessListener!!.success()
                     }
                 }
             }
 
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                isAnimation = true;
-                mAnimLayout.setVisibility(VISIBLE);
-                mFirst.setVisibility(INVISIBLE);
-                mSecond.setVisibility(INVISIBLE);
+            override fun onAnimationStart(animation: Animator) {
+                super.onAnimationStart(animation)
+                isAnimation = true
+                mAnimLayout!!.visibility = VISIBLE
+                mFirst!!.visibility = INVISIBLE
+                mSecond!!.visibility = INVISIBLE
             }
-        });
-        secondAnimator.start();
+        })
+        secondAnimator.start()
     }
 
     /**
      * 构造动画层 用于点击之后的动画
      * 为什么要做动画层？ 要保证动画在整个view上面执行。
      */
-    private void setUpAnimLayout() {
+    private fun setUpAnimLayout() {
         if (mAnimLayout == null) {
-            mAnimLayout = new RelativeLayout(getContext());
+            mAnimLayout = RelativeLayout(context)
         }
         if (!isAddAnimatorLayout) {
-            isAddAnimatorLayout = true;
-            addView(mAnimLayout);
+            isAddAnimatorLayout = true
+            addView(mAnimLayout)
         }
     }
 
     /**
      * 检测是否成功
      */
-    private boolean checkSuccess() {
-
-        boolean isSuccess = true;
-        for (int i = 0; i < mImagePieces.size(); i++) {
-            ImagePiece imagePiece = mImagePieces.get(i);
-            if (i != imagePiece.getIndex()) {
-                isSuccess = false;
+    private fun checkSuccess(): Boolean {
+        var isSuccess = true
+        for (i in mImagePieces!!.indices) {
+            val imagePiece = mImagePieces!![i]
+            if (i != imagePiece.index) {
+                isSuccess = false
             }
         }
-        return isSuccess;
+        return isSuccess
     }
 
-    public Bitmap getBitmap() {
-        return mBitmap;
+    private var mSuccessListener: SuccessListener? = null
+    fun addSuccessListener(successListener: SuccessListener?) {
+        mSuccessListener = successListener
     }
 
-    public int getRes() {
-        return res;
+    interface SuccessListener {
+        fun success()
     }
 
-    public int getCount() {
-        return mCount;
+    companion object {
+        const val GAME_MODE_NORMAL = "gameModeNormal"
+        const val GAME_MODE_EXCHANGE = "gameModeExchange"
+        private const val DEFAULT_MARGIN = 3
     }
 
-    private SuccessListener mSuccessListener;
-
-    public void addSuccessListener(SuccessListener successListener) {
-        this.mSuccessListener = successListener;
-    }
-
-    public interface SuccessListener {
-        public void success();
+    init {
+        init(context)
+        initBitmaps()
+        initBitmapsWidth()
     }
 }
