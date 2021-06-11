@@ -14,9 +14,6 @@ import com.crazy.crazyalarm.closeModeActivity.jigsaw.ui.PuzzleLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Administrator on 2017/3/31.
- */
 
 public class Utils {
 

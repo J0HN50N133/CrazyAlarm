@@ -21,9 +21,7 @@ import com.crazy.crazyalarm.R;
 import com.crazy.crazyalarm.closeModeActivity.jigsaw.Utils.Utils;
 import com.crazy.crazyalarm.closeModeActivity.jigsaw.module.ImageSoures;
 
-/**
- * Created by Axe on 2017/7/15.
- */
+
 
 public class SelectImageDialog extends DialogFragment {
 

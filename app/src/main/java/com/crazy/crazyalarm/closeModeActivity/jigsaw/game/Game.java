@@ -1,10 +1,6 @@
 package com.crazy.crazyalarm.closeModeActivity.jigsaw.game;
 
-/**
- * @Author Zaifeng
- * @Create 2017/7/13 0013
- * @Description Content
- */
+
 
 public interface Game {
 

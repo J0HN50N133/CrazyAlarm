@@ -3,9 +3,6 @@ package com.crazy.crazyalarm.closeModeActivity.jigsaw.module;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-/**
- * Created by Administrator on 2016/9/8 0008.
- */
 public class ImagePiece {
 
     public static final int TYPE_NORMAL = 0;

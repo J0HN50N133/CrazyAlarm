@@ -9,11 +9,6 @@ import android.widget.Toast;
 import com.crazy.crazyalarm.R;
 import com.crazy.crazyalarm.closeModeActivity.jigsaw.ui.PuzzleLayout;
 
-/**
- * @Author Zaifeng
- * @Create 2017/7/13 0013
- * @Description Content
- */
 
 public class PuzzleGame implements Game, PuzzleLayout.SuccessListener {
 
